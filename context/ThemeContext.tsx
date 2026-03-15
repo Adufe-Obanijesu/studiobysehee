@@ -9,7 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import ThemeToggle from "@/components/ThemeToggle";
+import Navbar from "@/components/Navbar";
 import { useGSAP } from "@gsap/react";
 import { cn } from "@/lib/utils";
 import gsap from "gsap";
@@ -114,7 +114,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
           style={{ transformOrigin: "center center" }}
           aria-hidden
         />
-        <ThemeToggle />
+        <Navbar />
         <main className="relative z-10">{children}</main>
       </main>
     </ThemeContext.Provider>

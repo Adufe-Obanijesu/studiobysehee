@@ -21,7 +21,7 @@ export default function ThemeToggle(props: UseThemeToggleProps = {}) {
       type="button"
       onClick={handleClick}
       disabled={disabled}
-      className="fixed top-10 right-10 z-50 rounded-full text-foreground hover:bg-muted transition-colors inline-flex items-center justify-center disabled:opacity-70 disabled:pointer-events-none"
+      className="relative rounded-full text-foreground hover:bg-muted transition-colors inline-flex items-center justify-center w-9 h-9 disabled:opacity-70 disabled:pointer-events-none"
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
     >
       <span

@@ -1,5 +1,7 @@
 "use client";
 
+// TODO: Ensure assets are loaded before the preloader starts
+
 import "@/lib/gsap-effects";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
