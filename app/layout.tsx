@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import "./globals.css";
-import Theme from "@/components/Theme";
+import { ThemeProvider } from "@/context/ThemeContext";
 
 const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
@@ -28,9 +28,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${cormorant.variable} ${dmSans.variable} font-dm antialiased dark overflow-hidden`}
+        className={`${cormorant.variable} ${dmSans.variable} font-dm antialiased overflow-hidden`}
       >
-        <Theme>{children}</Theme>
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );

@@ -5,16 +5,19 @@
 import { usePreloader } from "@/hooks/usePreloader";
 import { brands } from "@/data/brands";
 import { cn } from "@/lib/utils";
+import { useTheme } from "@/context/ThemeContext";
 
 const LINE1 = "Capture moments with";
 const LINE2 = "Studio by Sehee";
 
 export default function Preloader() {
   const { circleRef, line1Ref, line2Ref, gridRef } = usePreloader();
+  const theme = useTheme();
+  const isDark = theme !== null ? theme.isDark : false;
 
   return (
     <>
-      <section className="light bg-background h-screen w-full">
+      <section id="preloader" className={cn("bg-background h-screen w-full", isDark && "light")}>
         <div id="intro-2" className="flex h-screen flex-col items-center justify-center gap-6 opacity-0">
           <div className="overflow-hidden">
             <h1
