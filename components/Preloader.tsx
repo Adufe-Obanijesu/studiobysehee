@@ -7,7 +7,7 @@ import { brands } from "@/data/brands";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/context/ThemeContext";
 
-const LINE1 = "Capture moments with";
+const LINE1 = "All capture moments with";
 const LINE2 = "Studio by Sehee";
 
 export default function Preloader() {
@@ -17,7 +17,7 @@ export default function Preloader() {
 
   return (
     <>
-      <section id="preloader" className={cn("bg-background h-screen w-full", isDark && "light")}>
+      <section id="preloader" className={cn("bg-background h-screen w-full", isDark ? "light" : "dark")}>
         <div id="intro-2" className="flex h-screen flex-col items-center justify-center gap-6 opacity-0">
           <div className="overflow-hidden">
             <h1
