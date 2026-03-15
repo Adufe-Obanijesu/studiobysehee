@@ -47,14 +47,14 @@ function createGridExitAndIntroSwitchSegment(
       },
       "<"
     )
-    .set("#intro-1", { opacity: 0 })
+    .set("#intro-1", { opacity: 0, pointerEvents: "none" })
     .to("#intro-2", { opacity: 1, duration: 0.4, ease: "back.in" }, "<");
   return tl;
 }
 
 function createTextRevealSegment(
-  line1Chars: HTMLElement[],
-  line2Chars: HTMLElement[]
+  line1Chars: Element[],
+  line2Chars: Element[]
 ): gsap.core.Timeline {
   const tl = gsap.timeline();
   tl.to(line1Chars, {
@@ -93,8 +93,8 @@ function createCircleSegment(circleEl: HTMLElement): gsap.core.Timeline {
       "<"
     )
     .to(circleEl, {
-      scale: (window.innerWidth / 16) * 2,
-      duration: 1,
+      scale: (Math.max(window.innerWidth, window.innerHeight) / 16) * 2.5,
+      duration: 1.2,
       ease: "power3.inOut",
     });
   return tl;
@@ -114,7 +114,9 @@ export function usePreloader() {
   useGSAP(
     () => {
       if (!allLoaded || !gridRef.current) return;
-      const items = gridRef.current.querySelectorAll<HTMLElement>(".grid-item");
+      const items = Array.from(
+        gridRef.current.querySelectorAll<HTMLElement>(".grid-item")
+      );
       if (!items.length) return;
       const el1 = line1Ref.current;
       const el2 = line2Ref.current;
