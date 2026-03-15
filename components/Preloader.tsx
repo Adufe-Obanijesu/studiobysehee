@@ -7,7 +7,7 @@ import { brands } from "@/data/brands";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/context/ThemeContext";
 
-const LINE1 = "All capture moments with";
+const LINE1 = "...all capture moments with";
 const LINE2 = "Studio by Sehee";
 
 export default function Preloader() {

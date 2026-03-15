@@ -4,6 +4,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useRef,
   useState,
   type ReactNode,
@@ -13,8 +14,28 @@ import { useGSAP } from "@gsap/react";
 import { cn } from "@/lib/utils";
 import gsap from "gsap";
 
+const STORAGE_KEY = "SBS_preferred_theme";
 const CIRCLE_DURATION = 0.6;
 const THEME_SWITCH_OFFSET = 0.15;
+
+function getStoredTheme(): boolean {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored === "light") return false;
+    if (stored === "dark") return true;
+  } catch {
+    // ignore
+  }
+  return false; // fallback/default: light
+}
+
+function setStoredTheme(isDark: boolean): void {
+  try {
+    localStorage.setItem(STORAGE_KEY, isDark ? "dark" : "light");
+  } catch {
+    // ignore
+  }
+}
 
 type ThemeContextValue = {
   isDark: boolean;
@@ -28,10 +49,16 @@ export function useTheme(): ThemeContextValue | null {
   return useContext(ThemeContext);
 }
 
+const DEFAULT_IS_DARK = false; // fallback/default; must match on server and client to avoid hydration mismatch
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(DEFAULT_IS_DARK);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const circleRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setIsDark(getStoredTheme());
+  }, []);
 
   useGSAP(() => {}, { scope: circleRef });
 
@@ -66,6 +93,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       .add(
         () => {
           setIsDark(nextIsDark);
+          setStoredTheme(nextIsDark);
         },
         CIRCLE_DURATION - THEME_SWITCH_OFFSET
       );
