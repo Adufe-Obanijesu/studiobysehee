@@ -3,14 +3,10 @@
 import { useCallback, useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { SplitText } from "gsap/SplitText";
 import { NAV_LINKS, SOCIAL_LINKS } from "@/data/navbar";
-
-gsap.registerPlugin(SplitText);
 
 const DURATION = 0.35;
 const EASE = "power2.inOut";
-const STAGGER = 0.02;
 
 export function useNavbar() {
   return {
@@ -31,27 +27,34 @@ export function useNavLinkHover() {
       const el2 = line2Ref.current;
       if (!el1 || !el2) return;
 
-      const split1 = new SplitText(el1, { type: "chars", mask: "chars" });
-      const split2 = new SplitText(el2, { type: "chars", mask: "chars" });
-      const chars1 = split1.chars;
-      const chars2 = split2.chars;
+      gsap.set(el1, {
+        scale: 1,
+        opacity: 1,
+        yPercent: 0,
+        transformOrigin: "50% 50%",
+      });
 
-      gsap.set(chars2, { yPercent: 100 });
+      gsap.set(el2, {
+        scale: 0.8,
+        opacity: 0,
+        yPercent: 0,
+        transformOrigin: "50% 50%",
+      });
 
       const tl = gsap
         .timeline({ paused: true })
-        .to(chars1, {
-          yPercent: -100,
+        .to(el1, {
+          scale: 1.5,
+          opacity: 0,
           duration: DURATION,
-          stagger: STAGGER,
           ease: EASE,
         })
         .to(
-          chars2,
+          el2,
           {
-            yPercent: 0,
+            scale: 1,
+            opacity: 1,
             duration: DURATION,
-            stagger: STAGGER,
             ease: EASE,
           },
           "<"
@@ -61,19 +64,26 @@ export function useNavLinkHover() {
       return () => {
         tl.kill();
         timelineRef.current = null;
-        split1.revert();
-        split2.revert();
       };
     },
     { scope: wrapperRef }
   );
 
   const onMouseEnter = useCallback(() => {
-    timelineRef.current?.play();
+    timelineRef.current?.restart();
   }, []);
 
   const onMouseLeave = useCallback(() => {
-    timelineRef.current?.reverse();
+    const tl = timelineRef.current;
+    const el1 = line1Ref.current;
+    const el2 = line2Ref.current;
+
+    tl?.pause(0);
+
+    if (el1 && el2) {
+      gsap.set(el1, { scale: 1, opacity: 1, yPercent: 0 });
+      gsap.set(el2, { scale: 0.8, opacity: 0, yPercent: 0 });
+    }
   }, []);
 
   return { wrapperRef, line1Ref, line2Ref, onMouseEnter, onMouseLeave };
