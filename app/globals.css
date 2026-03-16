@@ -137,7 +137,7 @@
   }
 
   .transition-ease-200 {
-    @apply duration-200 ease-in-out;
+    @apply duration-200 ease-in-out; 
   }
 
   .transition-ease-300 {
@@ -146,5 +146,12 @@
 
   .transition-ease-400 {
     @apply duration-400 ease-in-out;
+  }
+
+  .nav-circle {
+    width: 200vmax;
+    height: 200vmax;
+    border-radius: 9999px;
+    transform-origin: center center;
   }
 }

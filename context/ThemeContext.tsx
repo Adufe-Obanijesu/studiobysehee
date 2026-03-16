@@ -4,34 +4,21 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useRef,
   useState,
   type ReactNode,
 } from "react";
 import Navbar from "@/components/Navbar";
 import { useGSAP } from "@gsap/react";
-import { cn } from "@/lib/utils";
 import gsap from "gsap";
 
-const STORAGE_KEY = "SBS_preferred_theme";
+const COOKIE_NAME = "SBS_preferred_theme";
 const CIRCLE_DURATION = 0.6;
 const THEME_SWITCH_OFFSET = 0.15;
 
-function getStoredTheme(): boolean {
+function setThemeCookie(isDark: boolean): void {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored === "light") return false;
-    if (stored === "dark") return true;
-  } catch {
-    // ignore
-  }
-  return false; // fallback/default: light
-}
-
-function setStoredTheme(isDark: boolean): void {
-  try {
-    localStorage.setItem(STORAGE_KEY, isDark ? "dark" : "light");
+    document.cookie = `${COOKIE_NAME}=${isDark ? "dark" : "light"}; path=/; max-age=31536000; SameSite=Lax`;
   } catch {
     // ignore
   }
@@ -49,16 +36,16 @@ export function useTheme(): ThemeContextValue | null {
   return useContext(ThemeContext);
 }
 
-const DEFAULT_IS_DARK = false; // fallback/default; must match on server and client to avoid hydration mismatch
-
-export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [isDark, setIsDark] = useState(DEFAULT_IS_DARK);
+export function ThemeProvider({
+  children,
+  initialIsDark = false,
+}: {
+  children: ReactNode;
+  initialIsDark?: boolean;
+}) {
+  const [isDark, setIsDark] = useState(initialIsDark);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const circleRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setIsDark(getStoredTheme());
-  }, []);
 
   useGSAP(() => {}, { scope: circleRef });
 
@@ -93,7 +80,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       .add(
         () => {
           setIsDark(nextIsDark);
-          setStoredTheme(nextIsDark);
+          setThemeCookie(nextIsDark);
+          if (nextIsDark) {
+            document.documentElement.classList.add("dark");
+          } else {
+            document.documentElement.classList.remove("dark");
+          }
         },
         CIRCLE_DURATION - THEME_SWITCH_OFFSET
       );
@@ -107,10 +99,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   return (
     <ThemeContext.Provider value={value}>
-      <main className={cn("bg-background min-h-screen", isDark && "dark")}>
+      <main className="bg-background min-h-screen">
         <div
           ref={circleRef}
-          className="fixed left-1/2 top-1/2 z-0 h-4 w-4 scale-0 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none bg-foreground"
+          className="fixed z-0 left-1/2 top-1/2 h-4 w-4 scale-0 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none bg-foreground"
           style={{ transformOrigin: "center center" }}
           aria-hidden
         />

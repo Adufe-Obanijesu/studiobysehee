@@ -18,8 +18,24 @@ export const NAV_LINKS: NavLink[] = [
 ];
 
 export const SOCIAL_LINKS: SocialLink[] = [
-  { label: "Instagram", href: "https://instagram.com", icon: "instagram" },
-  { label: "LinkedIn", href: "https://linkedin.com", icon: "linkedin" },
-  { label: "Pinterest", href: "https://pinterest.com", icon: "pinterest" },
-  { label: "IMDb", href: "https://imdb.com", icon: "imdb" },
+  {
+    label: "Instagram",
+    href: "http://www.instagram.com/sehee_in_newyork",
+    icon: "instagram",
+  },
+  {
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/in/sehee-kim-551197128/",
+    icon: "linkedin",
+  },
+  {
+    label: "Pinterest",
+    href: "https://www.pinterest.co.kr/studiobysehee1750/",
+    icon: "pinterest",
+  },
+  {
+    label: "IMDB",
+    href: "https://www.imdb.com/name/nm8635611/",
+    icon: "imdb",
+  },
 ];
