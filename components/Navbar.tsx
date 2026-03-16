@@ -101,6 +101,9 @@ export default function Navbar() {
     overlayScopeRef,
     circleRef,
     contentRef,
+    mobileLinksRef,
+    mobileSocialsRef,
+    mobileCtaRef,
     mobileButtonRef,
     menuIconRef,
     closeIconRef,
@@ -215,10 +218,13 @@ export default function Navbar() {
             className="flex-1 flex flex-col justify-center gap-6"
             onClick={(e) => e.stopPropagation()}
           >
-            <ul className="flex flex-col gap-6 text-3xl">
+            <ul
+              ref={mobileLinksRef}
+              className="flex flex-col gap-6 text-3xl"
+            >
               {navLinks.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} onClick={closeMobileMenu} className="text-foreground font-cormorant">
+                  <Link href={link.href} onClick={closeMobileMenu} className="mobile-nav-link inline-block scale-0 text-foreground font-cormorant">
                     {link.label}
                   </Link>
                 </li>
@@ -227,6 +233,7 @@ export default function Navbar() {
           </div>
 
           <div
+            ref={mobileSocialsRef}
             className="flex items-center lg:justify-center gap-4"
             onClick={(e) => e.stopPropagation()}
           >
@@ -245,9 +252,9 @@ export default function Navbar() {
             ))}
           </div>
 
-          <div className="shrink-0">
-              <BookSessionButton />
-            </div>
+          <div ref={mobileCtaRef} className="shrink-0">
+            <BookSessionButton />
+          </div>
         </div>
       </div>
     </header>

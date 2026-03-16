@@ -15,7 +15,11 @@ export function useNavbar() {
   const overlayScopeRef = useRef<HTMLDivElement | null>(null);
   const circleRef = useRef<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
+  const mobileLinksRef = useRef<HTMLUListElement | null>(null);
+  const mobileSocialsRef = useRef<HTMLDivElement | null>(null);
+  const mobileCtaRef = useRef<HTMLDivElement | null>(null);
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
+  const closeTimelineRef = useRef<gsap.core.Timeline | null>(null);
   const mobileButtonRef = useRef<HTMLButtonElement | null>(null);
   const menuIconRef = useRef<HTMLSpanElement | null>(null);
   const closeIconRef = useRef<HTMLSpanElement | null>(null);
@@ -25,18 +29,40 @@ export function useNavbar() {
     () => {
       const circle = circleRef.current;
       const content = contentRef.current;
+      const mobileLinksEl = mobileLinksRef.current;
+      const mobileSocialsEl = mobileSocialsRef.current;
+      const mobileCtaEl = mobileCtaRef.current;
 
       if (!circle || !content) return;
 
       gsap.set(circle, {
-        transformOrigin: "cennter center",
+        transformOrigin: "center center",
         scale: 0,
       });
 
       gsap.set(content, {
         opacity: 0,
-        y: 24,
       });
+
+      const mobileSocialItems = mobileSocialsEl
+        ? gsap.utils.toArray<HTMLElement>(
+            mobileSocialsEl.querySelectorAll("a")
+          )
+        : [];
+
+      const mobileCtaItems = mobileCtaEl
+        ? gsap.utils.toArray<HTMLElement>(
+            mobileCtaEl.querySelectorAll("a, button")
+          )
+        : [];
+
+      const mobileFadeTargets = [...mobileSocialItems, ...mobileCtaItems];
+
+      if (mobileFadeTargets.length) {
+        gsap.set(mobileFadeTargets, {
+          opacity: 0,
+        });
+      }
 
       const maxSize = Math.max(window.innerWidth, window.innerHeight);
       const finalScale = (maxSize / 16) * 2.5;
@@ -50,24 +76,49 @@ export function useNavbar() {
           paused: true,
           defaults: { duration: DURATION, ease: EASE },
         })
-        .to(circle, {
-          scale: finalScale,
-          duration: 1.2,
-          ease: "power3.inOut",
-        }, "<")
+        .to(
+          circle,
+          {
+            scale: finalScale,
+            duration: 1.2,
+            ease: "power3.inOut",
+          },
+          "<"
+        )
         .to(
           content,
           {
             opacity: 1,
-            y: 0,
-            duration: 0.4,
+            duration: 0.25,
           }
+        )
+        .to(
+          ".mobile-nav-link",
+          {
+            scale: 1,
+            duration: 0.4,
+            ease: EASE,
+            stagger: 0.05,
+          },
+          "-=0.15"
+        )
+        .to(
+          mobileFadeTargets,
+          {
+            opacity: 1,
+            duration: 0.35,
+            ease: EASE,
+            stagger: 0.04,
+          },
+          "-=0.15"
         );
 
       timelineRef.current = tl;
 
       return () => {
         tl.kill();
+        closeTimelineRef.current?.kill();
+        closeTimelineRef.current = null;
         timelineRef.current = null;
       };
     },
@@ -79,17 +130,73 @@ export function useNavbar() {
       const tl = timelineRef.current;
       if (!tl) return;
 
+      const circle = circleRef.current;
+      const content = contentRef.current;
+      if (!circle || !content) return;
+
       if (isMobileMenuOpen) {
+        closeTimelineRef.current?.kill();
+        closeTimelineRef.current = null;
+
+        // Ensure content and items are visible before playing open timeline
+        gsap.set([content, ".mobile-nav-link"], { opacity: 1 });
+
         gsap.set(overlayScopeRef.current, {
           pointerEvents: "auto",
         });
-        tl.play();
+        tl.restart();
       } else {
-        tl.reverse().eventCallback("onReverseComplete", () => {
-          gsap.set(overlayScopeRef.current, {
-            pointerEvents: "none",
+        // Close: fade out all inner elements, then shrink the circle
+        const mobileLinks = gsap.utils.toArray<HTMLElement>(".mobile-nav-link");
+
+        const mobileSocialsEl = mobileSocialsRef.current;
+        const mobileCtaEl = mobileCtaRef.current;
+
+        const mobileSocialItems = mobileSocialsEl
+          ? gsap.utils.toArray<HTMLElement>(
+              mobileSocialsEl.querySelectorAll("a")
+            )
+          : [];
+
+        const mobileCtaItems = mobileCtaEl
+          ? gsap.utils.toArray<HTMLElement>(
+              mobileCtaEl.querySelectorAll("a, button")
+            )
+          : [];
+
+        const fadeTargets = [
+          ...mobileLinks,
+          ...mobileSocialItems,
+          ...mobileCtaItems,
+        ];
+
+        tl.pause();
+        closeTimelineRef.current?.kill();
+
+        closeTimelineRef.current = gsap
+          .timeline({
+            defaults: { ease: EASE },
+            onComplete: () => {
+              gsap.set(overlayScopeRef.current, {
+                pointerEvents: "none",
+              });
+              tl.pause(0);
+            },
+          })
+          .to(
+            content,
+            {
+              opacity: 0,
+              duration: 0.4,
+              stagger: fadeTargets.length ? 0 : 0,
+            },
+            0
+          )
+          .to(circle, {
+            scale: 0,
+            duration: 1.2,
+            ease: "power3.inOut",
           });
-        });
       }
     },
     { dependencies: [isMobileMenuOpen] }
@@ -183,6 +290,9 @@ export function useNavbar() {
     overlayScopeRef,
     circleRef,
     contentRef,
+    mobileLinksRef,
+    mobileSocialsRef,
+    mobileCtaRef,
     mobileButtonRef,
     menuIconRef,
     closeIconRef,
