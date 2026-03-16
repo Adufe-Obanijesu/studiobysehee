@@ -1,8 +1,14 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, DM_Sans } from "next/font/google";
+import { Cormorant_Garamond, DM_Sans, Geist } from "next/font/google";
 import { cookies } from "next/headers";
 import "./globals.css";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { cn } from "@/lib/utils";
+import Preloader from "@/components/Preloader";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+
+
 // import CustomCursor from "@/components/CustomCursor";
 
 const cormorant = Cormorant_Garamond({
@@ -32,11 +38,12 @@ export default async function RootLayout({
   const initialIsDark = themeCookie?.value === "dark";
 
   return (
-    <html lang="en" className={initialIsDark ? "dark" : ""}>
+    <html lang="en" className={cn("overflow-hidden", initialIsDark ? "dark" : "", "font-sans", geist.variable)}>
       <body
         className={`relative ${cormorant.variable} ${dmSans.variable} font-dm antialiased overflow-hidden`}
       >
         <ThemeProvider initialIsDark={initialIsDark}>
+          <Preloader />
           {children}
           {/* <CustomCursor /> */}
         </ThemeProvider>

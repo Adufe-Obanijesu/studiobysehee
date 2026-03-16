@@ -106,10 +106,10 @@ export function ThemeProvider({
           style={{ transformOrigin: "center center" }}
           aria-hidden
         />
-        <main className="relative z-10">
+        <div className="relative z-10">
           <Navbar />
           {children}
-        </main>
+        </div>
       </main>
     </ThemeContext.Provider>
   );

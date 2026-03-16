@@ -9,6 +9,12 @@ import { useNavLinkHover, useNavbar } from "@/hooks/useNavbar";
 import type { NavLink, SocialLink } from "@/data/navbar";
 import { cn } from "@/lib/utils";
 import { useBookSessionButtonDebug } from "@/hooks/useBookSessionButtonDebug";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 function AnimatedNavLink({ link }: { link: NavLink }) {
   const { wrapperRef, line1Ref, line2Ref, onMouseEnter, onMouseLeave } =
@@ -112,7 +118,8 @@ export default function Navbar() {
 
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-9999"
+      id="navbar"
+      className="fixed top-0 left-0 right-0 z-9999 invisible"
       style={{
         background:
           "linear-gradient(to bottom, color-mix(in srgb, var(--background) 85%, transparent) 0%, transparent 100%)",
@@ -143,22 +150,31 @@ export default function Navbar() {
         {/* Right: theme toggle, socials, CTA (desktop) */}
         <div className="hidden md:flex items-center gap-1 shrink-0">
           <ThemeToggle />
-          <ul className="flex items-center gap-0" aria-label="Social links">
-            {socialLinks.map((social) => (
-              <li key={social.icon}>
-                <a
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  referrerPolicy="no-referrer"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                  aria-label={social.label}
-                >
-                  <SocialIcon icon={social.icon} />
-                </a>
-              </li>
-            ))}
-          </ul>
+          <TooltipProvider>
+            <ul className="flex items-center gap-0" aria-label="Social links">
+              {socialLinks.map((social) => (
+                <li key={social.icon}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <a
+                        href={social.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        referrerPolicy="no-referrer"
+                        className="text-muted-foreground hover:text-foreground transition-colors"
+                        aria-label={social.label}
+                      >
+                        <SocialIcon icon={social.icon} />
+                      </a>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <span className="text-background">{social.label}</span>
+                    </TooltipContent>
+                  </Tooltip>
+                </li>
+              ))}
+            </ul>
+          </TooltipProvider>
           <BookSessionButton />
         </div>
 

@@ -34,7 +34,7 @@ export const SOCIAL_LINKS: SocialLink[] = [
     icon: "pinterest",
   },
   {
-    label: "IMDB",
+    label: "IMDb",
     href: "https://www.imdb.com/name/nm8635611/",
     icon: "imdb",
   },

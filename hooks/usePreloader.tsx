@@ -146,7 +146,9 @@ export function usePreloader() {
       if (circleRef.current) {
         tl.add(createCircleSegment(circleRef.current));
       }
-      tl.set("#preloader", {display: "none"});
+      tl
+      .to("#navbar", {autoAlpha: 1}, "<+75%")
+      .set("#preloader", {display: "none"})
 
       return () => {
         split1.revert();

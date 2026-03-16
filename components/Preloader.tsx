@@ -17,12 +17,12 @@ export default function Preloader() {
 
   return (
     <>
-      <section id="preloader" className={cn("bg-background h-screen w-full", isDark ? "light" : "dark")}>
+      <section id="preloader" className={cn("bg-background h-screen w-full relative z-10", isDark ? "light" : "dark")}>
         <div id="intro-2" className="flex h-screen flex-col items-center justify-center gap-6 opacity-0">
           <div className="overflow-hidden">
             <h1
               ref={line1Ref}
-              className="md:text-2xl text-base font-medium text-foreground"
+              className="md:text-2xl text-lg font-medium text-foreground"
               aria-label={LINE1}
             >
               {LINE1}
@@ -32,7 +32,7 @@ export default function Preloader() {
             <div className="overflow-hidden">
               <h2
                 ref={line2Ref}
-                className="lg:text-8xl md:text-7xl text-4xl font-bold leading-tight text-foreground"
+                className="lg:text-8xl md:text-7xl text-5xl font-bold leading-tight text-foreground"
                 aria-label={LINE2}
               >
                 {LINE2}
