@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/context/ThemeContext";
+// import CustomCursor from "@/components/CustomCursor";
 
 const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
@@ -28,9 +29,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${cormorant.variable} ${dmSans.variable} font-dm antialiased overflow-hidden`}
+        className={`relative ${cormorant.variable} ${dmSans.variable} font-dm antialiased overflow-hidden`}
       >
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          {children}
+          {/* <CustomCursor /> */}
+        </ThemeProvider>
       </body>
     </html>
   );

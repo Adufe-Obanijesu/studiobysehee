@@ -9,7 +9,7 @@
 	--foreground: oklch(0.145 0.006 83);
 	--muted: oklch(0.925 0.006 83);
 	--muted-foreground: oklch(0.46 0.006 83);
-	--primary: oklch(0.45 0.2 27);
+	--primary: oklch(0.65 0.2 27);
 	--primary-foreground: oklch(0.98 0 0);
 	--secondary: oklch(0.925 0.006 83);
 	--secondary-foreground: oklch(0.145 0.006 83);
@@ -127,5 +127,8 @@
   }
   h1, h2, h3, h4, h5, h6 {
     @apply font-cormorant;
+  }
+  button {
+	@apply cursor-pointer;
   }
 }

@@ -114,8 +114,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
           style={{ transformOrigin: "center center" }}
           aria-hidden
         />
-        <Navbar />
-        <main className="relative z-10">{children}</main>
+        <main className="relative z-10">
+          <Navbar />
+          {children}
+        </main>
       </main>
     </ThemeContext.Provider>
   );
