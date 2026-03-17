@@ -427,7 +427,9 @@ export function useInfiniteCanvas() {
     );
     const rowStep = CELL_HEIGHT + GAP;
     const activePoolSize = columns * rows;
-    const wrapWidth = columns * cellWidth + (columns - 1) * GAP;
+    // Include one additional seam gap so the duplicate tile spacing
+    // matches the regular inter-column spacing.
+    const wrapWidth = columns * cellWidth + columns * GAP;
     const wrapHeight = rows * rowStep;
     const startX = -HORIZONTAL_OVERSCAN;
     // Start from the vertical center of the tile so users have content
