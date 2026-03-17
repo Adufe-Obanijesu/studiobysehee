@@ -1,6 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import { useInfiniteCanvas } from "@/hooks/useInfiniteCanvas";
+
+const PLACEHOLDER_SRC = "data:image/gif;base64,R0lGODlhAQABAAAAACw=";
 
 export default function InfiniteCanvas() {
   const { scopeRef, pool, setCellRef, onImageLoad } = useInfiniteCanvas();
@@ -15,13 +18,12 @@ export default function InfiniteCanvas() {
               ref={setCellRef(slotIndex)}
               className="absolute left-0 top-0 overflow-hidden rounded-xl bg-muted/20"
             >
-              <img
-                src={undefined}
+              <Image
+                src={PLACEHOLDER_SRC}
                 alt=""
-                width={1}
-                height={1}
+                fill
+                sizes="100vw"
                 loading="lazy"
-                decoding="async"
                 onLoad={onImageLoad}
                 className="h-full w-full object-cover opacity-0 transition-opacity duration-500 ease-out"
               />
