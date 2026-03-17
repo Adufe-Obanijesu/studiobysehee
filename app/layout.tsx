@@ -43,7 +43,7 @@ export default async function RootLayout({
         className={`relative ${cormorant.variable} ${dmSans.variable} font-dm antialiased overflow-hidden`}
       >
         <ThemeProvider initialIsDark={initialIsDark}>
-          <Preloader />
+          {/* <Preloader /> */}
           {children}
           {/* <CustomCursor /> */}
         </ThemeProvider>
