@@ -3,17 +3,12 @@
 import { useInfiniteCanvas } from "@/hooks/useInfiniteCanvas";
 
 export default function InfiniteCanvas() {
-  const { scopeRef, pool, getCellImage, setCellRef, onImageLoad } = useInfiniteCanvas();
+  const { scopeRef, pool, setCellRef, onImageLoad } = useInfiniteCanvas();
 
   return (
     <section ref={scopeRef} className="relative h-dvh w-full overflow-hidden bg-background">
       <div className="absolute inset-0">
         {pool.map((slotIndex) => {
-          const image = getCellImage(slotIndex);
-          if (!image) {
-            return null;
-          }
-
           return (
             <div
               key={`slot-${slotIndex}`}
@@ -21,10 +16,10 @@ export default function InfiniteCanvas() {
               className="absolute left-0 top-0 overflow-hidden rounded-xl bg-muted/20"
             >
               <img
-                src={image.src}
-                alt={image.alt || "Studio by Sehee photo"}
-                width={image.naturalWidth}
-                height={image.naturalHeight}
+                src={undefined}
+                alt=""
+                width={1}
+                height={1}
                 loading="lazy"
                 decoding="async"
                 onLoad={onImageLoad}

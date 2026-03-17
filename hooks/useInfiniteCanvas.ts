@@ -38,7 +38,7 @@ type GeometrySnapshot = {
 
 export function useInfiniteCanvas() {
   const scopeRef = useRef<HTMLElement | null>(null);
-  const cellRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const poolRefs = useRef<Array<HTMLDivElement | null>>([]);
   const resizeTimerRef = useRef<number | null>(null);
   const geometryRef = useRef<GeometrySnapshot>({
     columns: COLUMN_COUNT,
@@ -54,7 +54,7 @@ export function useInfiniteCanvas() {
 
   const applyLayoutToPool = useCallback((poolCount: number) => {
     const geometry = geometryRef.current;
-    const nodes = cellRefs.current.slice(0, poolCount);
+    const nodes = poolRefs.current.slice(0, poolCount);
 
     nodes.forEach((node, index) => {
       if (!node) {
@@ -67,6 +67,20 @@ export function useInfiniteCanvas() {
       const fallbackX = -HORIZONTAL_OVERSCAN + fallbackColumn * (geometry.cellWidth + GAP);
       const fallbackY = fallbackRow * (CELL_HEIGHT + GAP) + COLUMN_OFFSETS[fallbackColumn];
       const isVisible = slot?.visible ?? false;
+      const image = imageData.length > 0 ? imageData[index % imageData.length] : null;
+      const imageNode = node.querySelector("img");
+
+      if (imageNode && image) {
+        if (imageNode.getAttribute("src") !== image.src) {
+          imageNode.classList.add("opacity-0");
+          imageNode.classList.remove("opacity-100");
+          imageNode.setAttribute("src", image.src);
+        }
+
+        imageNode.setAttribute("alt", image.alt || "Studio by Sehee photo");
+        imageNode.setAttribute("width", String(image.naturalWidth));
+        imageNode.setAttribute("height", String(image.naturalHeight));
+      }
 
       gsap.set(node, {
         x: slot?.x ?? fallbackX,
@@ -77,7 +91,7 @@ export function useInfiniteCanvas() {
         force3D: true,
       });
     });
-  }, []);
+  }, [imageData]);
 
   const computeGeometry = useCallback((containerWidth: number, containerHeight: number) => {
     if (containerWidth <= 0 || containerHeight <= 0) {
@@ -143,7 +157,7 @@ export function useInfiniteCanvas() {
         return;
       }
 
-      const cells = cellRefs.current.slice(0, activePoolSize).filter(Boolean) as HTMLDivElement[];
+      const cells = poolRefs.current.slice(0, activePoolSize).filter(Boolean) as HTMLDivElement[];
       if (cells.length === 0) {
         return;
       }
@@ -168,7 +182,7 @@ export function useInfiniteCanvas() {
 
   const setCellRef = useCallback(
     (index: number) => (node: HTMLDivElement | null) => {
-      cellRefs.current[index] = node;
+      poolRefs.current[index] = node;
     },
     [],
   );
@@ -218,21 +232,9 @@ export function useInfiniteCanvas() {
 
   const pool = useMemo(() => Array.from({ length: poolSize }, (_, index) => index), [poolSize]);
 
-  const getCellImage = useCallback(
-    (index: number) => {
-      if (imageData.length === 0) {
-        return null;
-      }
-
-      return imageData[index % imageData.length];
-    },
-    [imageData],
-  );
-
   return {
     scopeRef,
     pool,
-    getCellImage,
     setCellRef,
     onImageLoad,
   };
