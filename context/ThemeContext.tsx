@@ -102,8 +102,7 @@ export function ThemeProvider({
       <main className="bg-background min-h-screen">
         <div
           ref={circleRef}
-          className="fixed z-0 left-1/2 top-1/2 h-4 w-4 scale-0 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none bg-foreground"
-          style={{ transformOrigin: "center center" }}
+          className="fixed z-0 left-1/2 top-1/2 h-4 w-4 scale-0 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none bg-foreground origin-center will-change-transform"
           aria-hidden
         />
         <div className="relative z-10">

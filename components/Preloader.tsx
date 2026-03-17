@@ -17,8 +17,8 @@ export default function Preloader() {
 
   return (
     <>
-      <section id="preloader" className={cn("bg-background h-screen w-full relative z-10", isDark ? "light" : "dark")}>
-        <div id="intro-2" className="flex h-screen flex-col items-center justify-center gap-6 opacity-0">
+      <section id="preloader" className={cn("bg-background h-dvh w-full relative z-10", isDark ? "light" : "dark")}>
+        <div id="intro-2" className="flex h-dvh flex-col items-center justify-center gap-6 opacity-0">
           <div className="overflow-hidden">
             <h1
               ref={line1Ref}
@@ -40,7 +40,7 @@ export default function Preloader() {
             </div>
             <div
               ref={circleRef}
-              className="md:h-4 md:w-4 h-3 w-3 lg:mt-6 md:mt-4 mt-2 shrink-0 opacity-0 rounded-full bg-foreground"
+              className="md:h-4 md:w-4 h-3 w-3 lg:mt-6 md:mt-4 mt-2 shrink-0 opacity-0 rounded-full bg-foreground will-change-transform"
               aria-hidden
             />
           </div>

@@ -149,6 +149,7 @@ export function usePreloader() {
       tl
       .to("#navbar", {autoAlpha: 1}, "<+75%")
       .set("#preloader", {display: "none"})
+      .set(circleRef.current, {willChange: "auto"})
 
       return () => {
         split1.revert();

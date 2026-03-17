@@ -220,7 +220,7 @@ export default function Navbar() {
         <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
           <div
             ref={circleRef}
-            className="h-4 w-4 md:h-6 md:w-6 rounded-full bg-background border-[.05px] border-border transition-colors duration-200 ease-in-out"
+            className="h-4 w-4 md:h-6 md:w-6 rounded-full bg-background border-[.05px] border-border transition-colors duration-200 ease-in-out will-change-transform"
           />
         </div>
 
