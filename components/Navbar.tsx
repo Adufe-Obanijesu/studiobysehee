@@ -156,7 +156,7 @@ export default function Navbar() {
                 <li key={social.icon}>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <a
+                      <Link
                         href={social.href}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -165,7 +165,7 @@ export default function Navbar() {
                         aria-label={social.label}
                       >
                         <SocialIcon icon={social.icon} />
-                      </a>
+                      </Link>
                     </TooltipTrigger>
                     <TooltipContent>
                       <span className="text-background">{social.label}</span>
@@ -254,7 +254,7 @@ export default function Navbar() {
             onClick={(e) => e.stopPropagation()}
           >
             {socialLinks.map((social) => (
-              <a
+              <Link
                 key={social.icon}
                 href={social.href}
                 target="_blank"
@@ -264,7 +264,7 @@ export default function Navbar() {
                 aria-label={social.label}
               >
                 <SocialIcon icon={social.icon} />
-              </a>
+              </Link>
             ))}
           </div>
 
