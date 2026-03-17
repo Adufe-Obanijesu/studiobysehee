@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, type SyntheticEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import people from "@/data/people.json";
@@ -24,7 +24,7 @@ type CanvasSlot = {
   visible: boolean;
 };
 
-const COLUMN_COUNT = 5;
+const TARGET_VISIBLE_COLUMN_COUNT = 5;
 const GAP = 20;
 const CELL_HEIGHT = 320;
 const COLUMN_OFFSETS = [0, -120, 60, -40, 80] as const;
@@ -35,6 +35,8 @@ const RESIZE_DEBOUNCE_MS = 150;
 type GeometrySnapshot = {
   columns: number;
   rows: number;
+  tileColumns: number;
+  tileRows: number;
   cellWidth: number;
   cellHeight: number;
   rowStep: number;
@@ -42,8 +44,8 @@ type GeometrySnapshot = {
   firstRow: number;
   containerWidth: number;
   containerHeight: number;
-  totalGridWidth: number;
-  totalGridHeight: number;
+  wrapWidth: number;
+  wrapHeight: number;
   activePoolSize: number;
   slots: CanvasSlot[];
 };
@@ -54,14 +56,69 @@ type VelocitySample = {
   dt: number;
 };
 
+const getCyclicColumnOffset = (column: number) =>
+  COLUMN_OFFSETS[((column % COLUMN_OFFSETS.length) + COLUMN_OFFSETS.length) % COLUMN_OFFSETS.length];
+
+const normalizeModulo = (value: number, modulo: number) =>
+  ((value % modulo) + modulo) % modulo;
+
+const getGreatestCommonDivisor = (a: number, b: number) => {
+  let x = Math.abs(a);
+  let y = Math.abs(b);
+  while (y !== 0) {
+    const temp = y;
+    y = x % y;
+    x = temp;
+  }
+  return x;
+};
+
+const getTileDimensions = (totalImages: number, strideColumns: number) => {
+  if (totalImages <= 0) {
+    return { tileColumns: 1, tileRows: 1 };
+  }
+
+  const minColumns = Math.max(1, Math.ceil(Math.sqrt(totalImages)));
+  let tileColumns = minColumns;
+
+  // Keep tile columns near-square while avoiding short repeat cycles
+  // when global column indices advance by a fixed viewport stride.
+  while (getGreatestCommonDivisor(tileColumns, strideColumns) !== 1) {
+    tileColumns += 1;
+  }
+
+  return {
+    tileColumns,
+    tileRows: Math.ceil(totalImages / tileColumns),
+  };
+};
+
+const getImageIndexFromGrid = (
+  gridX: number,
+  gridY: number,
+  tileColumns: number,
+  tileRows: number,
+  totalImages: number,
+) => {
+  if (totalImages <= 0) {
+    return 0;
+  }
+
+  const tileCol = normalizeModulo(gridX, tileColumns);
+  const tileRow = normalizeModulo(gridY, tileRows);
+  return (tileRow * tileColumns + tileCol) % totalImages;
+};
+
 export function useInfiniteCanvas() {
   const scopeRef = useRef<HTMLElement | null>(null);
   const poolRefs = useRef<Array<HTMLDivElement | null>>([]);
   const resizeTimerRef = useRef<number | null>(null);
   const wheelInertiaTimerRef = useRef<number | null>(null);
   const geometryRef = useRef<GeometrySnapshot>({
-    columns: COLUMN_COUNT,
+    columns: TARGET_VISIBLE_COLUMN_COUNT,
     rows: 0,
+    tileColumns: 1,
+    tileRows: 1,
     cellWidth: 0,
     cellHeight: CELL_HEIGHT,
     rowStep: CELL_HEIGHT + GAP,
@@ -69,8 +126,8 @@ export function useInfiniteCanvas() {
     firstRow: -ROW_BUFFER,
     containerWidth: 0,
     containerHeight: 0,
-    totalGridWidth: 0,
-    totalGridHeight: 0,
+    wrapWidth: 0,
+    wrapHeight: 0,
     activePoolSize: 0,
     slots: [],
   });
@@ -95,31 +152,34 @@ export function useInfiniteCanvas() {
   const poolSizeRef = useRef(0);
   const [poolSize, setPoolSize] = useState(0);
   const imageData = useMemo(() => people as PersonImage[], []);
+  const [slotImageIndices, setSlotImageIndices] = useState<number[]>([]);
+  const slotImageIndicesRef = useRef<number[]>([]);
 
-  const assignNodeImage = useCallback(
-    (node: HTMLDivElement, imageIndex: number) => {
-      if (imageData.length === 0) {
-        return;
+  const applySlotImageUpdates = useCallback((updates: Map<number, number>, requiredLength: number) => {
+    if (updates.size === 0 && slotImageIndicesRef.current.length >= requiredLength) {
+      return;
+    }
+
+    setSlotImageIndices((prev) => {
+      const nextLength = Math.max(requiredLength, prev.length);
+      const next = nextLength === prev.length ? prev.slice() : [...prev, ...Array(nextLength - prev.length).fill(0)];
+      let changed = nextLength !== prev.length;
+
+      updates.forEach((imageIndex, slotIndex) => {
+        if (next[slotIndex] !== imageIndex) {
+          next[slotIndex] = imageIndex;
+          changed = true;
+        }
+      });
+
+      if (!changed) {
+        return prev;
       }
 
-      const image = imageData[((imageIndex % imageData.length) + imageData.length) % imageData.length];
-      const imageNode = node.querySelector("img");
-      if (!imageNode) {
-        return;
-      }
-
-      if (imageNode.getAttribute("src") !== image.src) {
-        imageNode.classList.add("opacity-0");
-        imageNode.classList.remove("opacity-100");
-        imageNode.setAttribute("src", image.src);
-      }
-
-      imageNode.setAttribute("alt", image.alt || "Studio by Sehee photo");
-      imageNode.setAttribute("width", String(image.naturalWidth));
-      imageNode.setAttribute("height", String(image.naturalHeight));
-    },
-    [imageData],
-  );
+      slotImageIndicesRef.current = next;
+      return next;
+    });
+  }, []);
 
   const applyLayoutToPool = useCallback((poolCount: number) => {
     const geometry = geometryRef.current;
@@ -132,10 +192,10 @@ export function useInfiniteCanvas() {
       }
 
       const slot = geometry.slots[index];
-      const fallbackColumn = index % COLUMN_COUNT;
-      const fallbackRow = Math.floor(index / COLUMN_COUNT) - ROW_BUFFER;
+      const fallbackColumn = geometry.columns > 0 ? index % geometry.columns : 0;
+      const fallbackRow = geometry.columns > 0 ? Math.floor(index / geometry.columns) - ROW_BUFFER : -ROW_BUFFER;
       const fallbackX = -HORIZONTAL_OVERSCAN + fallbackColumn * (geometry.cellWidth + GAP) + pan.x;
-      const fallbackY = fallbackRow * geometry.rowStep + COLUMN_OFFSETS[fallbackColumn] + pan.y;
+      const fallbackY = fallbackRow * geometry.rowStep + getCyclicColumnOffset(fallbackColumn) + pan.y;
       const isVisible = index < geometry.activePoolSize && (slot?.visible ?? false);
 
       gsap.set(node, {
@@ -147,11 +207,8 @@ export function useInfiniteCanvas() {
         force3D: true,
       });
 
-      if (slot && isVisible) {
-        assignNodeImage(node, slot.imageIndex);
-      }
     });
-  }, [assignNodeImage]);
+  }, []);
 
   const pushVelocitySample = useCallback((dx: number, dy: number, dt: number) => {
     if (dt <= 0) {
@@ -262,10 +319,12 @@ export function useInfiniteCanvas() {
       return;
     }
 
-    const minX = -geometry.cellWidth - HORIZONTAL_OVERSCAN;
-    const maxX = geometry.containerWidth + geometry.cellWidth + HORIZONTAL_OVERSCAN;
-    const minY = -geometry.cellHeight - HORIZONTAL_OVERSCAN;
-    const maxY = geometry.containerHeight + geometry.cellHeight + HORIZONTAL_OVERSCAN;
+    const minX = -HORIZONTAL_OVERSCAN;
+    const maxX = geometry.containerWidth + HORIZONTAL_OVERSCAN;
+    const minY = -HORIZONTAL_OVERSCAN;
+    const maxY = geometry.containerHeight + HORIZONTAL_OVERSCAN;
+    const totalImages = imageData.length;
+    const imageUpdates = new Map<number, number>();
 
     for (let index = 0; index < activeCount; index += 1) {
       const slot = geometry.slots[index];
@@ -274,45 +333,57 @@ export function useInfiniteCanvas() {
         continue;
       }
 
-      const rowStep = geometry.rowStep;
       let wrapped = false;
       let worldX = slot.baseX + pan.x;
       let worldY = slot.baseY + pan.y;
 
-      while (worldX < minX) {
+      while (worldX + geometry.cellWidth < minX) {
         slot.gridX += geometry.columns;
-        slot.baseX += geometry.totalGridWidth;
+        slot.baseX += geometry.wrapWidth;
         wrapped = true;
         worldX = slot.baseX + pan.x;
       }
 
       while (worldX > maxX) {
         slot.gridX -= geometry.columns;
-        slot.baseX -= geometry.totalGridWidth;
+        slot.baseX -= geometry.wrapWidth;
         wrapped = true;
         worldX = slot.baseX + pan.x;
       }
 
-      while (worldY < minY) {
+      while (worldY + geometry.cellHeight < minY) {
         slot.gridY += geometry.rows;
-        slot.baseY += geometry.totalGridHeight;
+        slot.baseY += geometry.wrapHeight;
         wrapped = true;
         worldY = slot.baseY + pan.y;
       }
 
       while (worldY > maxY) {
         slot.gridY -= geometry.rows;
-        slot.baseY -= geometry.totalGridHeight;
+        slot.baseY -= geometry.wrapHeight;
         wrapped = true;
         worldY = slot.baseY + pan.y;
       }
 
       if (wrapped) {
-        slot.imageIndex = (slot.gridY * geometry.columns + slot.column) % Math.max(imageData.length, 1);
-        assignNodeImage(node, slot.imageIndex);
+        const nextImageIndex = getImageIndexFromGrid(
+          slot.gridX,
+          slot.gridY,
+          geometry.tileColumns,
+          geometry.tileRows,
+          totalImages,
+        );
+        if (slot.imageIndex !== nextImageIndex) {
+          slot.imageIndex = nextImageIndex;
+          imageUpdates.set(index, nextImageIndex);
+        }
       }
 
       gsap.set(node, { x: worldX, y: worldY, force3D: true });
+    }
+
+    if (imageUpdates.size > 0) {
+      applySlotImageUpdates(imageUpdates, poolSizeRef.current);
     }
 
     for (let index = activeCount; index < poolSizeRef.current; index += 1) {
@@ -325,36 +396,48 @@ export function useInfiniteCanvas() {
     }
 
     isDirtyRef.current = false;
-  }, [assignNodeImage, imageData.length]);
+  }, [applySlotImageUpdates, imageData.length]);
 
   const computeGeometry = useCallback((containerWidth: number, containerHeight: number) => {
     if (containerWidth <= 0 || containerHeight <= 0) {
       return;
     }
 
-    const columns = COLUMN_COUNT;
+    const { tileColumns, tileRows } = getTileDimensions(imageData.length, TARGET_VISIBLE_COLUMN_COUNT);
+    const columns = tileColumns;
+    const rows = tileRows;
     const cellWidth = Math.max(
       180,
-      Math.round((containerWidth + HORIZONTAL_OVERSCAN * 2 - GAP * (columns - 1)) / columns),
+      Math.round(
+        (containerWidth + HORIZONTAL_OVERSCAN * 2 - GAP * (TARGET_VISIBLE_COLUMN_COUNT - 1)) /
+          TARGET_VISIBLE_COLUMN_COUNT,
+      ),
     );
     const rowStep = CELL_HEIGHT + GAP;
-    const minOffset = Math.min(...COLUMN_OFFSETS);
-    const maxOffset = Math.max(...COLUMN_OFFSETS);
-    const visibleRows = Math.ceil((containerHeight + Math.abs(minOffset) + maxOffset) / rowStep);
-    const totalRows = visibleRows + ROW_BUFFER * 2;
-    const activePoolSize = columns * totalRows;
+    const activePoolSize = columns * rows;
+    const wrapWidth = columns * cellWidth + (columns - 1) * GAP;
+    const wrapHeight = rows * rowStep;
     const startX = -HORIZONTAL_OVERSCAN;
-    const firstRow = -ROW_BUFFER;
+    const firstRow = 0;
 
     const slots: CanvasSlot[] = [];
-    for (let row = 0; row < totalRows; row += 1) {
+    const initialImageUpdates = new Map<number, number>();
+    for (let row = 0; row < rows; row += 1) {
       const rowIndex = firstRow + row;
 
       for (let column = 0; column < columns; column += 1) {
-        const gridIndex = rowIndex * columns + column;
+        const gridIndex = getImageIndexFromGrid(
+          column,
+          rowIndex,
+          tileColumns,
+          tileRows,
+          imageData.length,
+        );
+        const slotIndex = slots.length;
+        initialImageUpdates.set(slotIndex, gridIndex);
         slots.push({
           baseX: startX + column * (cellWidth + GAP),
-          baseY: rowIndex * rowStep + COLUMN_OFFSETS[column],
+          baseY: rowIndex * rowStep + getCyclicColumnOffset(column),
           column,
           gridX: column,
           gridY: rowIndex,
@@ -366,7 +449,9 @@ export function useInfiniteCanvas() {
 
     geometryRef.current = {
       columns,
-      rows: totalRows,
+      rows,
+      tileColumns,
+      tileRows,
       cellWidth,
       cellHeight: CELL_HEIGHT,
       rowStep,
@@ -374,14 +459,15 @@ export function useInfiniteCanvas() {
       firstRow,
       containerWidth,
       containerHeight,
-      totalGridWidth: columns * (cellWidth + GAP),
-      totalGridHeight: totalRows * rowStep,
+      wrapWidth,
+      wrapHeight,
       activePoolSize,
       slots,
     };
 
     const currentPoolSize = poolSizeRef.current;
     const nextPoolSize = Math.max(currentPoolSize, activePoolSize);
+    applySlotImageUpdates(initialImageUpdates, nextPoolSize);
     if (nextPoolSize !== currentPoolSize) {
       poolSizeRef.current = nextPoolSize;
       setPoolSize(nextPoolSize);
@@ -390,7 +476,7 @@ export function useInfiniteCanvas() {
 
     applyLayoutToPool(nextPoolSize);
     setPanDirty();
-  }, [applyLayoutToPool, setPanDirty]);
+  }, [applyLayoutToPool, applySlotImageUpdates, imageData.length, setPanDirty]);
 
   useGSAP(
     () => {
@@ -435,14 +521,13 @@ export function useInfiniteCanvas() {
     [],
   );
 
-  const onImageLoad = useCallback((event: SyntheticEvent<HTMLImageElement>) => {
-    event.currentTarget.classList.remove("opacity-0");
-    event.currentTarget.classList.add("opacity-100");
-  }, []);
-
   useEffect(() => {
     poolSizeRef.current = poolSize;
   }, [poolSize]);
+
+  useEffect(() => {
+    slotImageIndicesRef.current = slotImageIndices;
+  }, [slotImageIndices]);
 
   useEffect(() => {
     const container = scopeRef.current;
@@ -653,11 +738,22 @@ export function useInfiniteCanvas() {
   }, [applyPanDelta, getAverageVelocity, killInertia, processPanFrame, startInertia]);
 
   const pool = useMemo(() => Array.from({ length: poolSize }, (_, index) => index), [poolSize]);
+  const slotImages = useMemo(
+    () =>
+      pool.map((slotIndex) => {
+        if (imageData.length === 0) {
+          return null;
+        }
+        const imageIndex = slotImageIndices[slotIndex] ?? 0;
+        return imageData[normalizeModulo(imageIndex, imageData.length)];
+      }),
+    [imageData, pool, slotImageIndices],
+  );
 
   return {
     scopeRef,
     pool,
+    slotImages,
     setCellRef,
-    onImageLoad,
   };
 }
