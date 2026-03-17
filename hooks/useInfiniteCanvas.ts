@@ -62,6 +62,18 @@ const getCyclicColumnOffset = (column: number) =>
 const normalizeModulo = (value: number, modulo: number) =>
   ((value % modulo) + modulo) % modulo;
 
+const getCenterOutOrder = (length: number) => {
+  const center = (length - 1) / 2;
+  return Array.from({ length }, (_, index) => index).sort((a, b) => {
+    const distanceDelta = Math.abs(a - center) - Math.abs(b - center);
+    if (distanceDelta !== 0) {
+      return distanceDelta;
+    }
+
+    return a - b;
+  });
+};
+
 const getGreatestCommonDivisor = (a: number, b: number) => {
   let x = Math.abs(a);
   let y = Math.abs(b);
@@ -418,14 +430,18 @@ export function useInfiniteCanvas() {
     const wrapWidth = columns * cellWidth + (columns - 1) * GAP;
     const wrapHeight = rows * rowStep;
     const startX = -HORIZONTAL_OVERSCAN;
-    const firstRow = 0;
+    // Start from the vertical center of the tile so users have content
+    // available both above and below the viewport on first load.
+    const firstRow = -Math.floor(rows / 2);
 
     const slots: CanvasSlot[] = [];
     const initialImageUpdates = new Map<number, number>();
-    for (let row = 0; row < rows; row += 1) {
-      const rowIndex = firstRow + row;
+    const rowOrder = getCenterOutOrder(rows);
+    const columnOrder = getCenterOutOrder(columns);
+    for (const rowOffset of rowOrder) {
+      const rowIndex = firstRow + rowOffset;
 
-      for (let column = 0; column < columns; column += 1) {
+      for (const column of columnOrder) {
         const gridIndex = getImageIndexFromGrid(
           column,
           rowIndex,
