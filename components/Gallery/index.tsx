@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGalleryImageLoading } from "@/hooks/useGalleryImageLoading";
 import { useGalleryMasonry } from "@/hooks/useGalleryMasonry";
+import { useGalleryVirtualization } from "@/hooks/useGalleryVirtualization";
 import type { GalleryProps } from "./types";
 
 export default function Gallery({
@@ -13,15 +14,18 @@ export default function Gallery({
   hasMore,
   loadMore,
 }: GalleryProps) {
-  const { containerRef, sentinelRef, columns, columnCount } = useGalleryMasonry({
-    images,
+  const { containerRef, visibleImages, topSpacerHeight, bottomSpacerHeight } =
+    useGalleryVirtualization(images);
+
+  const { sentinelRef, columns } = useGalleryMasonry({
+    images: visibleImages,
     hasMore,
     isFetchingMore,
     loadMore,
   });
-  const { isImageLoaded, markImageLoaded } = useGalleryImageLoading(images);
-  const isInitialLoading = isLoading && images.length === 0;
-  const isLoadingMore = isFetchingMore && images.length > 0;
+  const { isImageLoaded, markImageLoaded } = useGalleryImageLoading(visibleImages);
+  const isInitialLoading = isLoading && visibleImages.length === 0;
+  const isLoadingMore = isFetchingMore && visibleImages.length > 0;
   const initialSkeletonsPerColumn = 3;
   const loadingMoreSkeletonsPerColumn = 1;
   const skeletonAspectRatios = [0.75, 1.2, 0.9];
@@ -29,6 +33,10 @@ export default function Gallery({
   return (
     <section ref={containerRef} className="w-full px-4 py-4 md:px-6">
       <div>
+        {topSpacerHeight > 0 ? (
+          <div aria-hidden className="w-full" style={{ height: topSpacerHeight }} />
+        ) : null}
+
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
           {columns.map((column, columnIndex) => (
             <div key={`column-${columnIndex}`} className="flex flex-col gap-4">
@@ -81,6 +89,10 @@ export default function Gallery({
             </div>
           ))}
         </div>
+
+        {bottomSpacerHeight > 0 ? (
+          <div aria-hidden className="w-full" style={{ height: bottomSpacerHeight }} />
+        ) : null}
 
         <div ref={sentinelRef} className="h-10 w-full" />
 

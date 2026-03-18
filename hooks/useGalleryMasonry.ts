@@ -2,11 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  COLUMN_COUNT_DESKTOP,
-  COLUMN_COUNT_MOBILE,
-  COLUMN_COUNT_TABLET,
-  DESKTOP_BREAKPOINT,
-  TABLET_BREAKPOINT,
+  getResponsiveGalleryConfig,
 } from "@/components/Gallery/constants";
 import type { GalleryImage } from "@/components/Gallery/types";
 
@@ -18,9 +14,7 @@ type Params = {
 };
 
 const getColumnCountFromWidth = (width: number) => {
-  if (width >= DESKTOP_BREAKPOINT) return COLUMN_COUNT_DESKTOP;
-  if (width >= TABLET_BREAKPOINT) return COLUMN_COUNT_TABLET;
-  return COLUMN_COUNT_MOBILE;
+  return getResponsiveGalleryConfig(width).columnCount;
 };
 
 const getAspectRatio = (image: GalleryImage) =>
@@ -32,7 +26,6 @@ export function useGalleryMasonry({
   isFetchingMore,
   loadMore,
 }: Params) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const [columnCount, setColumnCount] = useState(2);
 
@@ -90,5 +83,5 @@ export function useGalleryMasonry({
     return () => observer.disconnect();
   }, [hasMore, isFetchingMore, loadMore]);
 
-  return { containerRef, sentinelRef, columns, columnCount };
+  return { sentinelRef, columns, columnCount };
 }
