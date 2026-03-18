@@ -5,6 +5,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 import Preloader from "@/components/Preloader";
+import QueryProvider from "@/components/QueryProvider";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
@@ -38,14 +39,18 @@ export default async function RootLayout({
   const initialIsDark = themeCookie?.value === "dark";
 
   return (
-    <html lang="en" className={cn("overflow-hidden", initialIsDark ? "dark" : "", "font-sans", geist.variable)}>
+    <html lang="en" className={cn(initialIsDark ? "dark" : "", "font-sans", geist.variable)}>
       <body
-        className={`relative ${cormorant.variable} ${dmSans.variable} font-dm antialiased overflow-hidden`}
+        className={`relative ${cormorant.variable} ${dmSans.variable} font-dm antialiased`}
       >
         <ThemeProvider initialIsDark={initialIsDark}>
-          {/* <Preloader /> */}
-          {children}
-          {/* <CustomCursor /> */}
+          <QueryProvider>
+            <Preloader />
+            <div id="page-content" className="">
+              {children}
+            </div>
+            {/* <CustomCursor /> */}
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>

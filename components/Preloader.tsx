@@ -17,7 +17,7 @@ export default function Preloader() {
 
   return (
     <>
-      <section id="preloader" className={cn("bg-background h-dvh w-full relative z-10", isDark ? "light" : "dark")}>
+      <section id="preloader" className={cn("fixed top-0 left-0 bg-background h-dvh w-full z-10", isDark ? "light" : "dark")}>
         <div id="intro-2" className="flex h-dvh flex-col items-center justify-center gap-6 opacity-0">
           <div className="overflow-hidden">
             <h1

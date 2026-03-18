@@ -147,7 +147,7 @@ export function usePreloader() {
         tl.add(createCircleSegment(circleRef.current));
       }
       tl
-      .to("#navbar", {autoAlpha: 1}, "<+75%")
+      .to("##navbar", {autoAlpha: 1}, "<+75%")
       .set("#preloader", {display: "none"})
       .set(circleRef.current, {willChange: "auto"})
 

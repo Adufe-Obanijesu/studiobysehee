@@ -1,5 +1,18 @@
-import InfiniteCanvas from "@/components/InfiniteCanvas";
+"use client";
+
+import Gallery from "@/components/Gallery";
+import { usePeopleGalleryQuery } from "@/hooks/usePeopleGalleryQuery";
 
 export default function Home() {
-  return <InfiniteCanvas />;
+  const { images, isLoading, isFetchingMore, hasMore, loadMore } = usePeopleGalleryQuery();
+
+  return (
+    <Gallery
+      images={images}
+      isLoading={isLoading}
+      isFetchingMore={isFetchingMore}
+      hasMore={hasMore}
+      loadMore={loadMore}
+    />
+  );
 }

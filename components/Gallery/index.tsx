@@ -1,0 +1,95 @@
+"use client";
+
+import Image from "next/image";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useGalleryImageLoading } from "@/hooks/useGalleryImageLoading";
+import { useGalleryMasonry } from "@/hooks/useGalleryMasonry";
+import type { GalleryProps } from "./types";
+
+export default function Gallery({
+  images,
+  isLoading,
+  isFetchingMore,
+  hasMore,
+  loadMore,
+}: GalleryProps) {
+  const { containerRef, sentinelRef, columns, columnCount } = useGalleryMasonry({
+    images,
+    hasMore,
+    isFetchingMore,
+    loadMore,
+  });
+  const { isImageLoaded, markImageLoaded } = useGalleryImageLoading(images);
+  const isInitialLoading = isLoading && images.length === 0;
+  const isLoadingMore = isFetchingMore && images.length > 0;
+  const initialSkeletonsPerColumn = 3;
+  const loadingMoreSkeletonsPerColumn = 1;
+  const skeletonAspectRatios = [0.75, 1.2, 0.9];
+
+  return (
+    <section ref={containerRef} className="w-full px-4 py-4 md:px-6">
+      <div>
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
+          {columns.map((column, columnIndex) => (
+            <div key={`column-${columnIndex}`} className="flex flex-col gap-4">
+              {column.map((image) => (
+                <article key={image.id} className="relative overflow-hidden rounded-xl bg-muted/20">
+                  {!isImageLoaded(image.id) ? (
+                    <Skeleton className="absolute inset-0 rounded-none" />
+                  ) : null}
+                  <Image
+                    src={image.src}
+                    alt={image.alt || "Gallery image"}
+                    width={image.width}
+                    height={image.height}
+                    sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                    className={`h-auto w-full object-cover transition-opacity duration-300 ${
+                      isImageLoaded(image.id) ? "opacity-100" : "opacity-0"
+                    }`}
+                    loading="lazy"
+                    onLoad={() => {
+                      markImageLoaded(image.id);
+                    }}
+                  />
+                </article>
+              ))}
+
+              {isInitialLoading
+                ? Array.from({ length: initialSkeletonsPerColumn }, (_, index) => (
+                    <Skeleton
+                      key={`gallery-initial-skeleton-${columnIndex}-${index}`}
+                      className="w-full rounded-xl"
+                      style={{
+                        aspectRatio: skeletonAspectRatios[(columnIndex + index) % skeletonAspectRatios.length],
+                      }}
+                    />
+                  ))
+                : null}
+
+              {isLoadingMore
+                ? Array.from({ length: loadingMoreSkeletonsPerColumn }, (_, index) => (
+                    <Skeleton
+                      key={`gallery-load-more-skeleton-${columnIndex}-${index}`}
+                      className="w-full rounded-xl"
+                      style={{
+                        aspectRatio:
+                          skeletonAspectRatios[
+                            (columnIndex + index + initialSkeletonsPerColumn) % skeletonAspectRatios.length
+                          ],
+                      }}
+                    />
+                  ))
+                : null}
+            </div>
+          ))}
+        </div>
+
+        <div ref={sentinelRef} className="h-10 w-full" />
+
+        {!hasMore && images.length > 0 ? (
+          <p className="py-6 text-center text-sm text-muted-foreground">You reached the end.</p>
+        ) : null}
+      </div>
+    </section>
+  );
+}
