@@ -46,7 +46,7 @@ export default async function RootLayout({
         <ThemeProvider initialIsDark={initialIsDark}>
           <QueryProvider>
             <Preloader />
-            <div id="page-content" className="">
+            <div id="page-content" className="invisible">
               {children}
             </div>
             {/* <CustomCursor /> */}

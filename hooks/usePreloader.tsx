@@ -147,8 +147,8 @@ export function usePreloader() {
         tl.add(createCircleSegment(circleRef.current));
       }
       tl
-      .to("##navbar", {autoAlpha: 1}, "<+75%")
       .set("#preloader", {display: "none"})
+      .to("#navbar, #page-content", {autoAlpha: 1, duration: .5, stagger: 0.25}, "<+75%")
       .set(circleRef.current, {willChange: "auto"})
 
       return () => {

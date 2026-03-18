@@ -120,15 +120,20 @@ export default function Navbar() {
     <header
       id="navbar"
       className="fixed top-0 left-0 right-0 z-9999 invisible"
-      style={{
-        background:
-          "linear-gradient(to bottom, color-mix(in srgb, var(--background) 85%, transparent) 0%, transparent 100%)",
-      }}
     >
-      <nav
-        className="relative z-9999 max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-8"
-        aria-label="Main navigation"
-      >
+      <div className="relative">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-24 md:h-36"
+          style={{
+            background:
+              "linear-gradient(to bottom, color-mix(in srgb, var(--background) 96%, transparent) 0%, transparent 100%)",
+          }}
+        />
+        <nav
+          className="relative z-9999 max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-8"
+          aria-label="Main navigation"
+        >
         {/* Logo */}
         <Link
           href="/"
@@ -207,7 +212,8 @@ export default function Navbar() {
             </span>
           </button>
         </div>
-      </nav>
+        </nav>
+      </div>
 
       {/* Mobile expanding circle and overlay */}
       <div

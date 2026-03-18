@@ -37,23 +37,14 @@ export function useGalleryMasonry({
   const [columnCount, setColumnCount] = useState(2);
 
   useEffect(() => {
-    const node = containerRef.current;
-    if (!node) return;
-
-    const updateColumns = (width: number) => {
-      setColumnCount(getColumnCountFromWidth(width));
+    const updateColumns = () => {
+      setColumnCount(getColumnCountFromWidth(window.innerWidth));
     };
 
-    const observer = new ResizeObserver((entries) => {
-      const entry = entries[0];
-      if (!entry) return;
-      updateColumns(entry.contentRect.width);
-    });
+    updateColumns();
+    window.addEventListener("resize", updateColumns);
 
-    observer.observe(node);
-    updateColumns(node.getBoundingClientRect().width);
-
-    return () => observer.disconnect();
+    return () => window.removeEventListener("resize", updateColumns);
   }, []);
 
   const columns = useMemo(() => {

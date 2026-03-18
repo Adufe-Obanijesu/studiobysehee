@@ -34,16 +34,14 @@ export default function Gallery({
             <div key={`column-${columnIndex}`} className="flex flex-col gap-4">
               {column.map((image) => (
                 <article key={image.id} className="relative overflow-hidden rounded-xl bg-muted/20">
-                  {!isImageLoaded(image.id) ? (
-                    <Skeleton className="absolute inset-0 rounded-none" />
-                  ) : null}
+                  <Skeleton className="pointer-events-none absolute inset-0 z-0 rounded-none" />
                   <Image
                     src={image.src}
                     alt={image.alt || "Gallery image"}
                     width={image.width}
                     height={image.height}
-                    sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
-                    className={`h-auto w-full object-cover transition-opacity duration-300 ${
+                    sizes="(max-width: 767px) 50vw, (max-width: 1279px) 33vw, 25vw"
+                    className={`relative z-10 h-auto w-full object-cover transition-opacity duration-300 ${
                       isImageLoaded(image.id) ? "opacity-100" : "opacity-0"
                     }`}
                     loading="lazy"
