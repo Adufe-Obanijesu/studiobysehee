@@ -41,7 +41,7 @@ export default function Gallery({
           {columns.map((column, columnIndex) => (
             <div key={`column-${columnIndex}`} className="flex flex-col gap-4">
               {column.map((image) => (
-                <article key={image.id} className="relative overflow-hidden rounded-xl bg-muted/20">
+                <figure key={image.id} className="relative overflow-hidden rounded-xl bg-muted/20">
                   <Skeleton className="pointer-events-none absolute inset-0 z-0 rounded-none" />
                   <Image
                     src={image.src}
@@ -57,7 +57,7 @@ export default function Gallery({
                       markImageLoaded(image.id);
                     }}
                   />
-                </article>
+                </figure>
               ))}
 
               {isInitialLoading

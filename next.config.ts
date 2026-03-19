@@ -3,7 +3,14 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   images: {
-    domains: ['format.creatorcdn.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'format.creatorcdn.com',
+        port: '',
+        pathname: '/**',
+      },
+    ],
   },
 };
 
