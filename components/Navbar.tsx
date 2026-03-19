@@ -64,8 +64,11 @@ function BookSessionButton() {
         style={{ transformOrigin: "center center" }}
         aria-hidden
       />
-      <span className="relative z-10 text-light transition-colors transition-ease-300 group-hover:text-background">
+      <span className="relative z-10 text-light transition-colors transition-ease-300 group-hover:text-background lg:hidden xl:inline-block">
         Book a session
+      </span>
+      <span className="relative z-10 text-light transition-colors transition-ease-300 group-hover:text-background lg:inline-block hidden xl:hidden">
+        Book
       </span>
     </Link>
   );
@@ -119,7 +122,7 @@ export default function Navbar() {
   return (
     <header
       id="navbar"
-      className="fixed top-0 left-0 right-0 z-9999 invisible"
+      className="fixed top-0 left-0 right-0 z-9999 invisibl"
     >
       <div className="relative">
         <div
@@ -143,8 +146,8 @@ export default function Navbar() {
           Studio by Sehee
         </Link>
 
-        {/* Center links - desktop only */}
-        <ul className="hidden md:flex items-center gap-6 justify-center">
+        {/* Center links - desktop only (lg+ so tablet uses mobile menu) */}
+        <ul className="hidden lg:flex items-center gap-6 justify-center">
           {navLinks.map((link) => (
             <li key={link.href}>
               <AnimatedNavLink link={link} />
@@ -153,7 +156,7 @@ export default function Navbar() {
         </ul>
 
         {/* Right: theme toggle, socials, CTA (desktop) */}
-        <div className="hidden md:flex items-center gap-1 shrink-0">
+        <div className="hidden lg:flex items-center gap-1 shrink-0">
           <ThemeToggle />
           <TooltipProvider>
             <ul className="flex items-center gap-0" aria-label="Social links">
@@ -183,8 +186,8 @@ export default function Navbar() {
           <BookSessionButton />
         </div>
 
-        {/* Right: theme toggle + hamburger (mobile) */}
-        <div className="flex md:hidden items-center gap-2 shrink-0">
+        {/* Right: theme toggle + hamburger (mobile + tablet) */}
+        <div className="flex lg:hidden items-center gap-2 shrink-0">
           <ThemeToggle />
           <button
             ref={mobileButtonRef}
@@ -218,7 +221,7 @@ export default function Navbar() {
       {/* Mobile expanding circle and overlay */}
       <div
         ref={overlayScopeRef}
-        className="pointer-events-none fixed inset-0 z-40 md:hidden invisible"
+        className="pointer-events-none fixed inset-0 z-40 lg:hidden invisible"
         role="dialog"
         aria-modal="true"
         aria-labelledby="mobile-main-menu-label"
