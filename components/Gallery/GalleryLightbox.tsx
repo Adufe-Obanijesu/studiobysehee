@@ -13,6 +13,7 @@ export type GalleryLightboxProps = {
   backdropRef: RefObject<HTMLDivElement | null>;
   contentWrapperRef: RefObject<HTMLDivElement | null>;
   isLightboxImageLoaded: boolean;
+  lightboxSizes: string;
   onImageLoad: () => void;
 };
 
@@ -23,6 +24,7 @@ export function GalleryLightbox({
   backdropRef,
   contentWrapperRef,
   isLightboxImageLoaded,
+  lightboxSizes,
   onImageLoad,
 }: GalleryLightboxProps) {
   if (!isOpen || !activeImage) return null;
@@ -72,7 +74,7 @@ export function GalleryLightbox({
             className={`relative z-10 object-contain transition-opacity duration-300 ${
               isLightboxImageLoaded ? "opacity-100" : "opacity-0"
             }`}
-            sizes="(max-width: 1024px) 100vw, 1024px"
+            sizes={lightboxSizes}
             priority
             onLoad={onImageLoad}
           />

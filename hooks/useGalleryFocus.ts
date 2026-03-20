@@ -4,6 +4,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import type { GalleryImage } from "@/components/Gallery/types";
+import {
+  GALLERY_GRID_IMAGE_SIZES,
+  GALLERY_LIGHTBOX_IMAGE_SIZES,
+} from "@/components/Gallery/constants";
 
 gsap.registerPlugin(useGSAP);
 
@@ -17,11 +21,13 @@ export function useGalleryFocus({ images, getFigureElement }: Params) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [openCounter, setOpenCounter] = useState(0);
   const [isLightboxImageLoaded, setIsLightboxImageLoaded] = useState(false);
+  const [lightboxSizes, setLightboxSizes] = useState(GALLERY_GRID_IMAGE_SIZES);
 
   const backdropRef = useRef<HTMLDivElement | null>(null);
   const contentWrapperRef = useRef<HTMLDivElement | null>(null);
   const originRef = useRef({ cx: 0, cy: 0 });
   const openTimelineRef = useRef<gsap.core.Timeline | null>(null);
+  const upgradeRafRef = useRef<number | null>(null);
   const getFigureElementRef = useRef(getFigureElement);
   getFigureElementRef.current = getFigureElement;
 
@@ -38,8 +44,17 @@ export function useGalleryFocus({ images, getFigureElement }: Params) {
 
       setActiveIndex(index);
       setIsLightboxImageLoaded(false);
+      setLightboxSizes(GALLERY_GRID_IMAGE_SIZES);
       setIsOpen(true);
       setOpenCounter((c) => c + 1);
+
+      if (upgradeRafRef.current !== null) {
+        cancelAnimationFrame(upgradeRafRef.current);
+      }
+      upgradeRafRef.current = requestAnimationFrame(() => {
+        upgradeRafRef.current = null;
+        setLightboxSizes(GALLERY_LIGHTBOX_IMAGE_SIZES);
+      });
     },
     [images],
   );
@@ -56,6 +71,14 @@ export function useGalleryFocus({ images, getFigureElement }: Params) {
     } else {
       setIsOpen(false);
     }
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (upgradeRafRef.current !== null) {
+        cancelAnimationFrame(upgradeRafRef.current);
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -123,6 +146,7 @@ export function useGalleryFocus({ images, getFigureElement }: Params) {
     activeIndex,
     activeImage,
     isLightboxImageLoaded,
+    lightboxSizes,
     markLightboxImageLoaded,
     backdropRef,
     contentWrapperRef,

@@ -8,6 +8,7 @@ import { useGalleryImageLoading } from "@/hooks/useGalleryImageLoading";
 import { useGalleryViewportPresence } from "@/hooks/useGalleryViewportPresence";
 import { useGalleryMasonry } from "@/hooks/useGalleryMasonry";
 import { useGalleryVirtualization } from "@/hooks/useGalleryVirtualization";
+import { GALLERY_GRID_IMAGE_SIZES } from "./constants";
 import type { GalleryProps } from "./types";
 
 export default function Gallery({
@@ -23,6 +24,7 @@ export default function Gallery({
     isOpen,
     activeImage,
     isLightboxImageLoaded,
+    lightboxSizes,
     markLightboxImageLoaded,
     backdropRef,
     contentWrapperRef,
@@ -55,6 +57,7 @@ export default function Gallery({
         backdropRef={backdropRef}
         contentWrapperRef={contentWrapperRef}
         isLightboxImageLoaded={isLightboxImageLoaded}
+        lightboxSizes={lightboxSizes}
         onImageLoad={markLightboxImageLoaded}
       />
 
@@ -78,7 +81,7 @@ export default function Gallery({
                     alt={image.alt || "Gallery image"}
                     width={image.width}
                     height={image.height}
-                    sizes="(max-width: 767px) 50vw, (max-width: 1279px) 33vw, 25vw"
+                    sizes={GALLERY_GRID_IMAGE_SIZES}
                     className={`relative z-10 h-auto w-full object-cover transition-opacity duration-300 ${
                       isImageLoaded(image.id) ? "opacity-100" : "opacity-0"
                     }`}
