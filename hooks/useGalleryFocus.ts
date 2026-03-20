@@ -98,7 +98,16 @@ export function useGalleryFocus({
     }
   }, []);
 
+  const isLightboxControlTarget = (target: EventTarget | null) =>
+    target instanceof Element &&
+    Boolean(target.closest("button,[data-lightbox-control='true']"));
+
   const onPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (isLightboxControlTarget(e.target)) {
+      pointerStartRef.current = null;
+      return;
+    }
+
     pointerStartRef.current = { x: e.clientX, y: e.clientY };
     if (e.currentTarget.hasPointerCapture?.(e.pointerId)) return;
     e.currentTarget.setPointerCapture?.(e.pointerId);
@@ -106,6 +115,11 @@ export function useGalleryFocus({
 
   const onPointerUp = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
+      if (isLightboxControlTarget(e.target)) {
+        pointerStartRef.current = null;
+        return;
+      }
+
       if (e.currentTarget.hasPointerCapture?.(e.pointerId)) {
         e.currentTarget.releasePointerCapture?.(e.pointerId);
       }

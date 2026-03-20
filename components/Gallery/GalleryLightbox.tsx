@@ -68,6 +68,7 @@ export function GalleryLightbox({
       <button
         type="button"
         onClick={onClose}
+        data-lightbox-control="true"
         className="pointer-events-auto absolute right-4 top-4 z-10001 rounded-md p-2 text-foreground transition-colors hover:bg-muted"
         aria-label="Close"
       >
@@ -78,6 +79,7 @@ export function GalleryLightbox({
       <button
         type="button"
         onClick={onNavigatePrev}
+        data-lightbox-control="true"
         className={cn(
           "pointer-events-auto absolute left-4 top-1/2 z-10001 -translate-y-1/2 rounded-md p-2 text-foreground transition-all hover:bg-muted",
           !canNavigatePrev && "pointer-events-none opacity-0",
@@ -92,6 +94,7 @@ export function GalleryLightbox({
       <button
         type="button"
         onClick={onNavigateNext}
+        data-lightbox-control="true"
         className={cn(
           "pointer-events-auto absolute right-4 top-1/2 z-10001 -translate-y-1/2 rounded-md p-2 text-foreground transition-all hover:bg-muted",
           !canNavigateNext && "pointer-events-none opacity-0",
