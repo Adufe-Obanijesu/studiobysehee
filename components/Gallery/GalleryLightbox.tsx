@@ -17,10 +17,9 @@ export type GalleryLightboxProps = {
   onNavigateNext: () => void;
   onPointerDown: React.PointerEventHandler<HTMLDivElement>;
   onPointerUp: React.PointerEventHandler<HTMLDivElement>;
-  onPointerCancel: () => void;
+  onPointerCancel: React.PointerEventHandler<HTMLDivElement>;
   backdropRef: RefObject<HTMLDivElement | null>;
   contentWrapperRef: RefObject<HTMLDivElement | null>;
-  closeCursorRef: RefObject<HTMLDivElement | null>;
   captionMaskRef: RefObject<HTMLDivElement | null>;
   captionTextRef: RefObject<HTMLParagraphElement | null>;
   isLightboxImageLoaded: boolean;
@@ -41,7 +40,6 @@ export function GalleryLightbox({
   onPointerCancel,
   backdropRef,
   contentWrapperRef,
-  closeCursorRef,
   captionMaskRef,
   captionTextRef,
   isLightboxImageLoaded,
@@ -52,7 +50,7 @@ export function GalleryLightbox({
 
   return (
     <div
-      className="pointer-events-none fixed inset-0 z-10000"
+      className="pointer-events-none fixed inset-0 z-10000 touch-none"
       role="dialog"
       aria-modal="true"
       aria-label="Image focus"
@@ -103,15 +101,6 @@ export function GalleryLightbox({
       >
         <HiChevronRight className="size-7" aria-hidden />
       </button>
-
-      {/* Cursor label: follows mouse over backdrop, fades in/out */}
-      <div
-        ref={closeCursorRef}
-        className="pointer-events-none fixed left-0 top-0 -translate-x-full -translate-y-full hidden lg:block select-none rounded-full bg-foreground px-3 py-1.5 text-xs font-medium uppercase tracking-widest text-background"
-        aria-hidden
-      >
-        Close
-      </div>
 
       {/* Content wrapper: scales up from the clicked image's origin */}
       <div

@@ -34,7 +34,6 @@ export default function Gallery({
     markLightboxImageLoaded,
     backdropRef,
     contentWrapperRef,
-    closeCursorRef,
     captionMaskRef,
     captionTextRef,
     openFromImageId,
@@ -81,7 +80,6 @@ export default function Gallery({
         onPointerCancel={onPointerCancel}
         backdropRef={backdropRef}
         contentWrapperRef={contentWrapperRef}
-        closeCursorRef={closeCursorRef}
         captionMaskRef={captionMaskRef}
         captionTextRef={captionTextRef}
         isLightboxImageLoaded={isLightboxImageLoaded}

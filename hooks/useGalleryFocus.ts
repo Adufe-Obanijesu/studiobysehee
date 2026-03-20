@@ -35,7 +35,6 @@ export function useGalleryFocus({
 
   const backdropRef = useRef<HTMLDivElement | null>(null);
   const contentWrapperRef = useRef<HTMLDivElement | null>(null);
-  const closeCursorRef = useRef<HTMLDivElement | null>(null);
   const captionMaskRef = useRef<HTMLDivElement | null>(null);
   const captionTextRef = useRef<HTMLParagraphElement | null>(null);
   const originRef = useRef({ cx: 0, cy: 0 });
@@ -101,10 +100,15 @@ export function useGalleryFocus({
 
   const onPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     pointerStartRef.current = { x: e.clientX, y: e.clientY };
+    if (e.currentTarget.hasPointerCapture?.(e.pointerId)) return;
+    e.currentTarget.setPointerCapture?.(e.pointerId);
   }, []);
 
   const onPointerUp = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
+      if (e.currentTarget.hasPointerCapture?.(e.pointerId)) {
+        e.currentTarget.releasePointerCapture?.(e.pointerId);
+      }
       const start = pointerStartRef.current;
       if (!start) return;
       pointerStartRef.current = null;
@@ -130,7 +134,10 @@ export function useGalleryFocus({
     [navigate, close],
   );
 
-  const onPointerCancel = useCallback(() => {
+  const onPointerCancel = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.currentTarget.hasPointerCapture?.(e.pointerId)) {
+      e.currentTarget.releasePointerCapture?.(e.pointerId);
+    }
     pointerStartRef.current = null;
   }, []);
 
@@ -241,44 +248,6 @@ export function useGalleryFocus({
     { dependencies: [activeIndex, isOpen], revertOnUpdate: true },
   );
 
-  useGSAP(
-    () => {
-      if (!isOpen) return;
-
-      const backdrop = backdropRef.current;
-      const cursor = closeCursorRef.current;
-      if (!backdrop || !cursor) return;
-
-      gsap.set(cursor, { xPercent: -50, yPercent: -50, autoAlpha: 0 });
-
-      const xTo = gsap.quickTo(cursor, "x", { duration: 0.4, ease: "power3.out" });
-      const yTo = gsap.quickTo(cursor, "y", { duration: 0.4, ease: "power3.out" });
-
-      const onMouseMove = (e: MouseEvent) => {
-        xTo(e.clientX);
-        yTo(e.clientY);
-      };
-      const onMouseEnter = () => {
-        gsap.to(cursor, { autoAlpha: 1, duration: 0.2, ease: "power2.out" });
-      };
-      const onMouseLeave = () => {
-        gsap.to(cursor, { autoAlpha: 0, duration: 0.15, ease: "power2.in" });
-      };
-
-      backdrop.addEventListener("mousemove", onMouseMove);
-      backdrop.addEventListener("mouseenter", onMouseEnter);
-      backdrop.addEventListener("mouseleave", onMouseLeave);
-
-      return () => {
-        backdrop.removeEventListener("mousemove", onMouseMove);
-        backdrop.removeEventListener("mouseenter", onMouseEnter);
-        backdrop.removeEventListener("mouseleave", onMouseLeave);
-        gsap.killTweensOf(cursor);
-      };
-    },
-    { dependencies: [isOpen], revertOnUpdate: true },
-  );
-
   const markLightboxImageLoaded = useCallback(() => {
     setIsLightboxImageLoaded(true);
   }, []);
@@ -294,7 +263,6 @@ export function useGalleryFocus({
     markLightboxImageLoaded,
     backdropRef,
     contentWrapperRef,
-    closeCursorRef,
     captionMaskRef,
     captionTextRef,
     openFromImageId,
