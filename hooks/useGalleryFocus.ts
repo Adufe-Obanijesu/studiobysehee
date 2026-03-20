@@ -4,10 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import type { GalleryImage } from "@/components/Gallery/types";
-import {
-  GALLERY_GRID_IMAGE_SIZES,
-  GALLERY_LIGHTBOX_IMAGE_SIZES,
-} from "@/components/Gallery/constants";
+import { GALLERY_LIGHTBOX_IMAGE_SIZES } from "@/components/Gallery/constants";
 
 gsap.registerPlugin(useGSAP);
 
@@ -17,7 +14,6 @@ const PAGINATION_PREFETCH_DISTANCE = 5;
 type Params = {
   images: GalleryImage[];
   getFigureElement: (imageId: number) => HTMLElement | null;
-  isImageLoaded: (imageId: number) => boolean;
   hasMore: boolean;
   isFetchingMore: boolean;
   loadMore: () => void;
@@ -27,7 +23,6 @@ type Params = {
 export function useGalleryFocus({
   images,
   getFigureElement,
-  isImageLoaded,
   hasMore,
   isFetchingMore,
   loadMore,
@@ -37,44 +32,24 @@ export function useGalleryFocus({
   const [activeIndex, setActiveIndex] = useState(0);
   const [openCounter, setOpenCounter] = useState(0);
   const [isLightboxImageLoaded, setIsLightboxImageLoaded] = useState(false);
-  const [lightboxSizes, setLightboxSizes] = useState(GALLERY_GRID_IMAGE_SIZES);
 
   const backdropRef = useRef<HTMLDivElement | null>(null);
   const contentWrapperRef = useRef<HTMLDivElement | null>(null);
   const closeCursorRef = useRef<HTMLDivElement | null>(null);
   const originRef = useRef({ cx: 0, cy: 0 });
   const openTimelineRef = useRef<gsap.core.Timeline | null>(null);
-  const upgradeRafRef = useRef<number | null>(null);
   const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
+  const pendingScrollIndexRef = useRef<number | null>(null);
 
   // Always-current refs to avoid stale closures in stable callbacks
   const activeIndexRef = useRef(activeIndex);
   activeIndexRef.current = activeIndex;
-  const isImageLoadedRef = useRef(isImageLoaded);
-  isImageLoadedRef.current = isImageLoaded;
   const scrollToIndexRef = useRef(scrollToIndex);
   scrollToIndexRef.current = scrollToIndex;
   const getFigureElementRef = useRef(getFigureElement);
   getFigureElementRef.current = getFigureElement;
   const imagesRef = useRef(images);
   imagesRef.current = images;
-
-  // Conditionally apply grid→lightbox sizes trick only for cached images.
-  const applyConditionalSizes = useCallback((imageId: number) => {
-    if (upgradeRafRef.current !== null) {
-      cancelAnimationFrame(upgradeRafRef.current);
-      upgradeRafRef.current = null;
-    }
-    if (isImageLoadedRef.current(imageId)) {
-      setLightboxSizes(GALLERY_GRID_IMAGE_SIZES);
-      upgradeRafRef.current = requestAnimationFrame(() => {
-        upgradeRafRef.current = null;
-        setLightboxSizes(GALLERY_LIGHTBOX_IMAGE_SIZES);
-      });
-    } else {
-      setLightboxSizes(GALLERY_LIGHTBOX_IMAGE_SIZES);
-    }
-  }, []);
 
   const openFromImageId = useCallback(
     (imageId: number) => {
@@ -91,44 +66,32 @@ export function useGalleryFocus({
       setIsLightboxImageLoaded(false);
       setIsOpen(true);
       setOpenCounter((c) => c + 1);
-      applyConditionalSizes(imageId);
     },
-    [images, applyConditionalSizes],
+    [images],
   );
 
-  const navigate = useCallback(
-    (direction: 1 | -1) => {
-      const current = activeIndexRef.current;
-      const imgs = imagesRef.current;
-      const next = current + direction;
-      if (next < 0 || next >= imgs.length) return;
-      const nextImage = imgs[next];
-      setActiveIndex(next);
-      setIsLightboxImageLoaded(false);
-      applyConditionalSizes(nextImage.id);
-    },
-    [applyConditionalSizes],
-  );
+  const navigate = useCallback((direction: 1 | -1) => {
+    const next = activeIndexRef.current + direction;
+    if (next < 0 || next >= imagesRef.current.length) return;
+    setActiveIndex(next);
+    setIsLightboxImageLoaded(false);
+  }, []);
 
   const navigatePrev = useCallback(() => navigate(-1), [navigate]);
   const navigateNext = useCallback(() => navigate(1), [navigate]);
 
   const close = useCallback(() => {
-    const targetIndex = activeIndexRef.current;
-    const doClose = () => {
-      setIsOpen(false);
-      scrollToIndexRef.current(targetIndex);
-    };
+    pendingScrollIndexRef.current = activeIndexRef.current;
     const tl = openTimelineRef.current;
     if (tl) {
       tl.eventCallback("onReverseComplete", () => {
-        doClose();
+        setIsOpen(false);
         openTimelineRef.current = null;
         tl.eventCallback("onReverseComplete", null);
       });
       tl.reverse();
     } else {
-      doClose();
+      setIsOpen(false);
     }
   }, []);
 
@@ -168,20 +131,21 @@ export function useGalleryFocus({
   }, []);
 
   useEffect(() => {
-    return () => {
-      if (upgradeRafRef.current !== null) {
-        cancelAnimationFrame(upgradeRafRef.current);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
     if (!isOpen) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = prev;
     };
+  }, [isOpen]);
+
+  // Scroll restoration — runs AFTER the overflow cleanup above, guaranteeing
+  // the document is scrollable before window.scrollTo is called.
+  useEffect(() => {
+    if (isOpen || pendingScrollIndexRef.current === null) return;
+    const index = pendingScrollIndexRef.current;
+    pendingScrollIndexRef.current = null;
+    scrollToIndexRef.current(index);
   }, [isOpen]);
 
   useEffect(() => {
@@ -287,7 +251,7 @@ export function useGalleryFocus({
     canNavigatePrev: activeIndex > 0,
     canNavigateNext: activeIndex < images.length - 1,
     isLightboxImageLoaded,
-    lightboxSizes,
+    lightboxSizes: GALLERY_LIGHTBOX_IMAGE_SIZES,
     markLightboxImageLoaded,
     backdropRef,
     contentWrapperRef,

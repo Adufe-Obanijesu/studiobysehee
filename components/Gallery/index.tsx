@@ -45,7 +45,6 @@ export default function Gallery({
   } = useGalleryFocus({
     images,
     getFigureElement,
-    isImageLoaded,
     hasMore,
     isFetchingMore,
     loadMore,
