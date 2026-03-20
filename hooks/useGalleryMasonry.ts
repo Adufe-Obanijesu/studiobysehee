@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   getResponsiveGalleryConfig,
 } from "@/components/Gallery/constants";
@@ -29,7 +29,7 @@ export function useGalleryMasonry({
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const [columnCount, setColumnCount] = useState(2);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const updateColumns = () => {
       setColumnCount(getColumnCountFromWidth(window.innerWidth));
     };

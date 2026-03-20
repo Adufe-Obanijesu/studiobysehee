@@ -8,6 +8,7 @@ import { useGalleryImageLoading } from "@/hooks/useGalleryImageLoading";
 import { useGalleryViewportPresence } from "@/hooks/useGalleryViewportPresence";
 import { useGalleryMasonry } from "@/hooks/useGalleryMasonry";
 import { useGalleryVirtualization } from "@/hooks/useGalleryVirtualization";
+import { useGallerySkeletonLayout } from "@/hooks/useGallerySkeletonLayout";
 import { GALLERY_GRID_IMAGE_SIZES } from "./constants";
 import type { GalleryProps } from "./types";
 
@@ -42,12 +43,13 @@ export default function Gallery({
     isFetchingMore,
     loadMore,
   });
+  const { initialSkeletonsPerColumn, loadingMoreSkeletonsPerColumn, skeletonAspectRatios } =
+    useGallerySkeletonLayout({
+      columnCount: columns.length,
+    });
   const { isImageLoaded, markImageLoaded } = useGalleryImageLoading(visibleImages);
   const isInitialLoading = isLoading && visibleImages.length === 0;
   const isLoadingMore = isFetchingMore && visibleImages.length > 0;
-  const initialSkeletonsPerColumn = 3;
-  const loadingMoreSkeletonsPerColumn = 1;
-  const skeletonAspectRatios = [0.75, 1.2, 0.9];
 
   return (
     <section ref={containerRef} className="w-full px-4 py-4 md:px-6">

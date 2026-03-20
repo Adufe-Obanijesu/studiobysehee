@@ -58,7 +58,7 @@ export function GalleryLightbox({
       {/* Cursor label: follows mouse over backdrop, fades in/out */}
       <div
         ref={closeCursorRef}
-        className="pointer-events-none fixed left-0 top-0 select-none rounded-full bg-foreground px-3 py-1.5 text-xs font-medium uppercase tracking-widest text-background"
+        className="pointer-events-none fixed left-0 top-0 select-none rounded-full bg-foreground px-3 py-1.5 text-xs font-medium uppercase tracking-widest text-background hidden lg:block"
         aria-hidden
       >
         Close
