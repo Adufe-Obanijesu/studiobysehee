@@ -49,7 +49,7 @@ function AnimatedNavLink({ link }: { link: NavLink }) {
   );
 }
 
-function BookSessionButton() {
+export function BookSessionButton() {
 
   return (
     <Link
@@ -71,7 +71,7 @@ function BookSessionButton() {
   );
 }
 
-function SocialIcon({ icon }: { icon: SocialLink["icon"] }) {
+export function SocialIcon({ icon }: { icon: SocialLink["icon"] }) {
   switch (icon) {
     case "instagram":
       return <div className="relative group flex items-center justify-center p-2 rounded-full">

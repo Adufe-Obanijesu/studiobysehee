@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 import Preloader from "@/components/Preloader";
 import QueryProvider from "@/components/QueryProvider";
+import Footer from "@/components/Footer";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
@@ -50,6 +51,7 @@ export default async function RootLayout({
             {/* <Preloader /> */}
             <div id="page-content" className="invisibl mt-14">
               {children}
+              <Footer />
             </div>
             {/* <CustomCursor /> */}
           </QueryProvider>
