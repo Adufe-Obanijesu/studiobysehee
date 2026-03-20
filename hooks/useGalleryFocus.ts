@@ -11,12 +11,28 @@ import {
 
 gsap.registerPlugin(useGSAP);
 
+const SWIPE_THRESHOLD_PX = 50;
+const PAGINATION_PREFETCH_DISTANCE = 5;
+
 type Params = {
   images: GalleryImage[];
   getFigureElement: (imageId: number) => HTMLElement | null;
+  isImageLoaded: (imageId: number) => boolean;
+  hasMore: boolean;
+  isFetchingMore: boolean;
+  loadMore: () => void;
+  scrollToIndex: (index: number) => void;
 };
 
-export function useGalleryFocus({ images, getFigureElement }: Params) {
+export function useGalleryFocus({
+  images,
+  getFigureElement,
+  isImageLoaded,
+  hasMore,
+  isFetchingMore,
+  loadMore,
+  scrollToIndex,
+}: Params) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [openCounter, setOpenCounter] = useState(0);
@@ -29,8 +45,36 @@ export function useGalleryFocus({ images, getFigureElement }: Params) {
   const originRef = useRef({ cx: 0, cy: 0 });
   const openTimelineRef = useRef<gsap.core.Timeline | null>(null);
   const upgradeRafRef = useRef<number | null>(null);
+  const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
+
+  // Always-current refs to avoid stale closures in stable callbacks
+  const activeIndexRef = useRef(activeIndex);
+  activeIndexRef.current = activeIndex;
+  const isImageLoadedRef = useRef(isImageLoaded);
+  isImageLoadedRef.current = isImageLoaded;
+  const scrollToIndexRef = useRef(scrollToIndex);
+  scrollToIndexRef.current = scrollToIndex;
   const getFigureElementRef = useRef(getFigureElement);
   getFigureElementRef.current = getFigureElement;
+  const imagesRef = useRef(images);
+  imagesRef.current = images;
+
+  // Conditionally apply grid→lightbox sizes trick only for cached images.
+  const applyConditionalSizes = useCallback((imageId: number) => {
+    if (upgradeRafRef.current !== null) {
+      cancelAnimationFrame(upgradeRafRef.current);
+      upgradeRafRef.current = null;
+    }
+    if (isImageLoadedRef.current(imageId)) {
+      setLightboxSizes(GALLERY_GRID_IMAGE_SIZES);
+      upgradeRafRef.current = requestAnimationFrame(() => {
+        upgradeRafRef.current = null;
+        setLightboxSizes(GALLERY_LIGHTBOX_IMAGE_SIZES);
+      });
+    } else {
+      setLightboxSizes(GALLERY_LIGHTBOX_IMAGE_SIZES);
+    }
+  }, []);
 
   const openFromImageId = useCallback(
     (imageId: number) => {
@@ -45,33 +89,82 @@ export function useGalleryFocus({ images, getFigureElement }: Params) {
 
       setActiveIndex(index);
       setIsLightboxImageLoaded(false);
-      setLightboxSizes(GALLERY_GRID_IMAGE_SIZES);
       setIsOpen(true);
       setOpenCounter((c) => c + 1);
-
-      if (upgradeRafRef.current !== null) {
-        cancelAnimationFrame(upgradeRafRef.current);
-      }
-      upgradeRafRef.current = requestAnimationFrame(() => {
-        upgradeRafRef.current = null;
-        setLightboxSizes(GALLERY_LIGHTBOX_IMAGE_SIZES);
-      });
+      applyConditionalSizes(imageId);
     },
-    [images],
+    [images, applyConditionalSizes],
   );
 
+  const navigate = useCallback(
+    (direction: 1 | -1) => {
+      const current = activeIndexRef.current;
+      const imgs = imagesRef.current;
+      const next = current + direction;
+      if (next < 0 || next >= imgs.length) return;
+      const nextImage = imgs[next];
+      setActiveIndex(next);
+      setIsLightboxImageLoaded(false);
+      applyConditionalSizes(nextImage.id);
+    },
+    [applyConditionalSizes],
+  );
+
+  const navigatePrev = useCallback(() => navigate(-1), [navigate]);
+  const navigateNext = useCallback(() => navigate(1), [navigate]);
+
   const close = useCallback(() => {
+    const targetIndex = activeIndexRef.current;
+    const doClose = () => {
+      setIsOpen(false);
+      scrollToIndexRef.current(targetIndex);
+    };
     const tl = openTimelineRef.current;
     if (tl) {
       tl.eventCallback("onReverseComplete", () => {
-        setIsOpen(false);
+        doClose();
         openTimelineRef.current = null;
         tl.eventCallback("onReverseComplete", null);
       });
       tl.reverse();
     } else {
-      setIsOpen(false);
+      doClose();
     }
+  }, []);
+
+  const onPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    pointerStartRef.current = { x: e.clientX, y: e.clientY };
+  }, []);
+
+  const onPointerUp = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      const start = pointerStartRef.current;
+      if (!start) return;
+      pointerStartRef.current = null;
+
+      const deltaX = e.clientX - start.x;
+      const deltaY = e.clientY - start.y;
+      const absX = Math.abs(deltaX);
+      const absY = Math.abs(deltaY);
+
+      if (absX > SWIPE_THRESHOLD_PX && absX > absY) {
+        navigate(deltaX < 0 ? 1 : -1);
+        return;
+      }
+
+      // Close on backdrop tap only (minimal pointer movement)
+      if (absX <= 10 && absY <= 10) {
+        const backdrop = backdropRef.current;
+        if (backdrop && (e.target === backdrop || backdrop.contains(e.target as Node))) {
+          close();
+        }
+      }
+    },
+    [navigate, close],
+  );
+
+  const onPointerCancel = useCallback(() => {
+    pointerStartRef.current = null;
   }, []);
 
   useEffect(() => {
@@ -94,14 +187,21 @@ export function useGalleryFocus({ images, getFigureElement }: Params) {
   useEffect(() => {
     if (!isOpen) return;
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        e.preventDefault();
-        close();
-      }
+      if (e.key === "Escape") { e.preventDefault(); close(); }
+      if (e.key === "ArrowRight") { e.preventDefault(); navigate(1); }
+      if (e.key === "ArrowLeft") { e.preventDefault(); navigate(-1); }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [isOpen, close]);
+  }, [isOpen, close, navigate]);
+
+  // Prefetch next page when approaching the end of loaded images during slideshow
+  useEffect(() => {
+    if (!isOpen || !hasMore || isFetchingMore) return;
+    if (activeIndex >= images.length - PAGINATION_PREFETCH_DISTANCE) {
+      loadMore();
+    }
+  }, [activeIndex, hasMore, images.length, isFetchingMore, isOpen, loadMore]);
 
   const activeImage =
     isOpen && activeIndex >= 0 && activeIndex < images.length
@@ -184,6 +284,8 @@ export function useGalleryFocus({ images, getFigureElement }: Params) {
     isOpen,
     activeIndex,
     activeImage,
+    canNavigatePrev: activeIndex > 0,
+    canNavigateNext: activeIndex < images.length - 1,
     isLightboxImageLoaded,
     lightboxSizes,
     markLightboxImageLoaded,
@@ -191,6 +293,11 @@ export function useGalleryFocus({ images, getFigureElement }: Params) {
     contentWrapperRef,
     closeCursorRef,
     openFromImageId,
+    navigatePrev,
+    navigateNext,
+    onPointerDown,
+    onPointerUp,
+    onPointerCancel,
     close,
   };
 }

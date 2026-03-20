@@ -19,9 +19,16 @@ export default function Gallery({
 }: GalleryProps) {
   const { registerFigureRef, getFigureElement } = useGalleryViewportPresence();
 
+  const { containerRef, visibleImages, topSpacerHeight, bottomSpacerHeight, scrollToIndex } =
+    useGalleryVirtualization(images);
+
+  const { isImageLoaded, markImageLoaded } = useGalleryImageLoading(visibleImages);
+
   const {
     isOpen,
     activeImage,
+    canNavigatePrev,
+    canNavigateNext,
     isLightboxImageLoaded,
     lightboxSizes,
     markLightboxImageLoaded,
@@ -29,11 +36,21 @@ export default function Gallery({
     contentWrapperRef,
     closeCursorRef,
     openFromImageId,
+    navigatePrev,
+    navigateNext,
+    onPointerDown,
+    onPointerUp,
+    onPointerCancel,
     close,
-  } = useGalleryFocus({ images, getFigureElement });
-
-  const { containerRef, visibleImages, topSpacerHeight, bottomSpacerHeight } =
-    useGalleryVirtualization(images);
+  } = useGalleryFocus({
+    images,
+    getFigureElement,
+    isImageLoaded,
+    hasMore,
+    isFetchingMore,
+    loadMore,
+    scrollToIndex,
+  });
 
   const { sentinelRef, columns } = useGalleryMasonry({
     images: visibleImages,
@@ -45,7 +62,6 @@ export default function Gallery({
     useGallerySkeletonLayout({
       columnCount: columns.length,
     });
-  const { isImageLoaded, markImageLoaded } = useGalleryImageLoading(visibleImages);
   const isInitialLoading = isLoading && visibleImages.length === 0;
   const isLoadingMore = isFetchingMore && visibleImages.length > 0;
 
@@ -55,6 +71,13 @@ export default function Gallery({
         isOpen={isOpen}
         activeImage={activeImage}
         onClose={close}
+        canNavigatePrev={canNavigatePrev}
+        canNavigateNext={canNavigateNext}
+        onNavigatePrev={navigatePrev}
+        onNavigateNext={navigateNext}
+        onPointerDown={onPointerDown}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerCancel}
         backdropRef={backdropRef}
         contentWrapperRef={contentWrapperRef}
         closeCursorRef={closeCursorRef}

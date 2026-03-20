@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getResponsiveGalleryConfig } from "@/components/Gallery/constants";
 import type { GalleryImage } from "@/components/Gallery/types";
 
@@ -11,6 +11,9 @@ export function useGalleryVirtualization(images: GalleryImage[]) {
   const [scrollY, setScrollY] = useState(0);
   const [containerTop, setContainerTop] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
+
+  const startsRef = useRef<number[]>([]);
+  const containerTopRef = useRef(0);
 
   useEffect(() => {
     let rafId = 0;
@@ -28,6 +31,7 @@ export function useGalleryVirtualization(images: GalleryImage[]) {
         prev === innerHeight ? prev : innerHeight,
       );
       setScrollY((prev) => (prev === currentScrollY ? prev : currentScrollY));
+      containerTopRef.current = nextContainerTop;
       setContainerTop((prev) =>
         Math.abs(prev - nextContainerTop) < 1 ? prev : nextContainerTop,
       );
@@ -156,6 +160,8 @@ export function useGalleryVirtualization(images: GalleryImage[]) {
       }
     }
 
+    startsRef.current = starts;
+
     const visibleImages = images.slice(startIndex, endIndex + 1);
     const topSpacerHeight = starts[startIndex] ?? 0;
     const bottomSpacerHeight = Math.max(0, totalHeight - (ends[endIndex] ?? 0));
@@ -176,8 +182,15 @@ export function useGalleryVirtualization(images: GalleryImage[]) {
     viewportWidth,
   ]);
 
+  const scrollToIndex = useCallback((index: number) => {
+    const top = startsRef.current[index];
+    if (top === undefined) return;
+    window.scrollTo({ top: containerTopRef.current + top, behavior: "instant" });
+  }, []);
+
   return {
     containerRef,
+    scrollToIndex,
     ...virtualState,
   };
 }

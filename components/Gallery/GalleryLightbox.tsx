@@ -3,13 +3,21 @@
 import type { RefObject } from "react";
 import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
-import { HiOutlineX } from "react-icons/hi";
+import { HiOutlineX, HiChevronLeft, HiChevronRight } from "react-icons/hi";
+import { cn } from "@/lib/utils";
 import type { GalleryImage } from "./types";
 
 export type GalleryLightboxProps = {
   isOpen: boolean;
   activeImage: GalleryImage | null;
   onClose: () => void;
+  canNavigatePrev: boolean;
+  canNavigateNext: boolean;
+  onNavigatePrev: () => void;
+  onNavigateNext: () => void;
+  onPointerDown: React.PointerEventHandler<HTMLDivElement>;
+  onPointerUp: React.PointerEventHandler<HTMLDivElement>;
+  onPointerCancel: () => void;
   backdropRef: RefObject<HTMLDivElement | null>;
   contentWrapperRef: RefObject<HTMLDivElement | null>;
   closeCursorRef: RefObject<HTMLDivElement | null>;
@@ -22,6 +30,13 @@ export function GalleryLightbox({
   isOpen,
   activeImage,
   onClose,
+  canNavigatePrev,
+  canNavigateNext,
+  onNavigatePrev,
+  onNavigateNext,
+  onPointerDown,
+  onPointerUp,
+  onPointerCancel,
   backdropRef,
   contentWrapperRef,
   closeCursorRef,
@@ -37,16 +52,17 @@ export function GalleryLightbox({
       role="dialog"
       aria-modal="true"
       aria-label="Image focus"
+      onPointerDown={onPointerDown}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerCancel}
     >
-      {/* Backdrop: fades in independently, click closes lightbox */}
+      {/* Backdrop: fades in independently, tap-to-close handled by pointer events */}
       <div
         ref={backdropRef}
-        onClick={onClose}
         className="pointer-events-auto absolute inset-0 bg-background/95 backdrop-blur-sm"
-        style={{ willChange: "opacity" }}
       />
 
-      {/* Close button: always above backdrop and content */}
+      {/* Close button */}
       <button
         type="button"
         onClick={onClose}
@@ -56,10 +72,38 @@ export function GalleryLightbox({
         <HiOutlineX className="size-6" aria-hidden />
       </button>
 
+      {/* Prev arrow */}
+      <button
+        type="button"
+        onClick={onNavigatePrev}
+        className={cn(
+          "pointer-events-auto absolute left-4 top-1/2 z-10001 -translate-y-1/2 rounded-md p-2 text-foreground transition-all hover:bg-muted",
+          !canNavigatePrev && "pointer-events-none opacity-0",
+        )}
+        aria-label="Previous image"
+        tabIndex={canNavigatePrev ? 0 : -1}
+      >
+        <HiChevronLeft className="size-7" aria-hidden />
+      </button>
+
+      {/* Next arrow */}
+      <button
+        type="button"
+        onClick={onNavigateNext}
+        className={cn(
+          "pointer-events-auto absolute right-4 top-1/2 z-10001 -translate-y-1/2 rounded-md p-2 text-foreground transition-all hover:bg-muted",
+          !canNavigateNext && "pointer-events-none opacity-0",
+        )}
+        aria-label="Next image"
+        tabIndex={canNavigateNext ? 0 : -1}
+      >
+        <HiChevronRight className="size-7" aria-hidden />
+      </button>
+
       {/* Cursor label: follows mouse over backdrop, fades in/out */}
       <div
         ref={closeCursorRef}
-        className="pointer-events-none fixed left-0 top-0 -translate-x-full -translate-y-full select-none rounded-full bg-foreground px-3 py-1.5 text-xs font-medium uppercase tracking-widest text-background hidden lg:block"
+        className="pointer-events-none fixed left-0 top-0 select-none rounded-full bg-foreground px-3 py-1.5 text-xs font-medium uppercase tracking-widest text-background"
         aria-hidden
       >
         Close
@@ -68,7 +112,7 @@ export function GalleryLightbox({
       {/* Content wrapper: scales up from the clicked image's origin */}
       <div
         ref={contentWrapperRef}
-        className="pointer-events-none absolute inset-0 flex items-center justify-center px-4 py-16 will-change-transform"
+        className="pointer-events-none absolute inset-0 flex items-center justify-center px-4 py-16"
       >
         <div
           className="pointer-events-auto relative overflow-hidden rounded-xl"
