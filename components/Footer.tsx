@@ -7,7 +7,7 @@ export default function Footer() {
   return (
     <footer className="bg-background">
       <div className="container mx-auto px-4 py-8 flex flex-col gap-4 items-center justify-center">
-      <div className="hidden lg:flex items-center gap-1 shrink-0">
+      <div className="flex flex-col md:flex-row items-center md:gap-1 gap-3 shrink-0">
           <TooltipProvider>
             <ul className="flex items-center gap-0" aria-label="Social links">
               {SOCIAL_LINKS.map((social) => (

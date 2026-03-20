@@ -28,7 +28,7 @@ export default function TestimonialsPage() {
               <CardContent>
                 <div className="flex items-start gap-4">
                     <div className="min-w-0 flex-1">
-                      <h3 className="font-semibold hover:text-primary transition-colors">{testimonial.name}</h3>
+                      <h3 className="font-semibold transition-colors">{testimonial.name}</h3>
                     </div>
                 </div>
 
