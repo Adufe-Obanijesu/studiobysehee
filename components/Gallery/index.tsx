@@ -28,6 +28,7 @@ export default function Gallery({
     markLightboxImageLoaded,
     backdropRef,
     contentWrapperRef,
+    closeCursorRef,
     openFromImageId,
     close,
   } = useGalleryFocus({ images, getFigureElement });
@@ -56,6 +57,7 @@ export default function Gallery({
         onClose={close}
         backdropRef={backdropRef}
         contentWrapperRef={contentWrapperRef}
+        closeCursorRef={closeCursorRef}
         isLightboxImageLoaded={isLightboxImageLoaded}
         lightboxSizes={lightboxSizes}
         onImageLoad={markLightboxImageLoaded}
