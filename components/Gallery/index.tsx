@@ -1,15 +1,13 @@
 "use client";
 
-import Image from "next/image";
-import { Skeleton } from "@/components/ui/skeleton";
 import { GalleryLightbox } from "./GalleryLightbox";
+import { GalleryGrid } from "./GalleryGrid";
 import { useGalleryFocus } from "@/hooks/useGalleryFocus";
 import { useGalleryImageLoading } from "@/hooks/useGalleryImageLoading";
 import { useGalleryViewportPresence } from "@/hooks/useGalleryViewportPresence";
 import { useGalleryMasonry } from "@/hooks/useGalleryMasonry";
 import { useGalleryVirtualization } from "@/hooks/useGalleryVirtualization";
 import { useGallerySkeletonLayout } from "@/hooks/useGallerySkeletonLayout";
-import { GALLERY_GRID_IMAGE_SIZES } from "./constants";
 import type { GalleryProps } from "./types";
 
 export default function Gallery({
@@ -70,77 +68,24 @@ export default function Gallery({
           <div aria-hidden className="w-full" style={{ height: topSpacerHeight }} />
         ) : null}
 
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
-          {columns.map((column, columnIndex) => (
-            <div key={`column-${columnIndex}`} className="flex flex-col gap-4">
-              {column.map((image) => (
-                <figure
-                  key={image.id}
-                  ref={registerFigureRef(image.id)}
-                  className="relative overflow-hidden rounded-xl bg-muted/20"
-                >
-                  <Skeleton className="pointer-events-none absolute inset-0 z-0 rounded-none" />
-                  <Image
-                    src={image.src}
-                    alt={image.alt || "Gallery image"}
-                    width={image.width}
-                    height={image.height}
-                    sizes={GALLERY_GRID_IMAGE_SIZES}
-                    className={`relative z-10 h-auto w-full object-cover transition-opacity duration-300 ${
-                      isImageLoaded(image.id) ? "opacity-100" : "opacity-0"
-                    }`}
-                    loading="lazy"
-                    onLoad={() => {
-                      markImageLoaded(image.id);
-                    }}
-                  />
-                  <button
-                    type="button"
-                    className="absolute inset-0 z-20 cursor-pointer rounded-xl bg-transparent"
-                    aria-label={`Open image: ${image.alt || "Gallery image"}`}
-                    onClick={() => openFromImageId(image.id)}
-                  />
-                </figure>
-              ))}
-
-              {isInitialLoading
-                ? Array.from({ length: initialSkeletonsPerColumn }, (_, index) => (
-                    <Skeleton
-                      key={`gallery-initial-skeleton-${columnIndex}-${index}`}
-                      className="w-full rounded-xl"
-                      style={{
-                        aspectRatio: skeletonAspectRatios[(columnIndex + index) % skeletonAspectRatios.length],
-                      }}
-                    />
-                  ))
-                : null}
-
-              {isLoadingMore
-                ? Array.from({ length: loadingMoreSkeletonsPerColumn }, (_, index) => (
-                    <Skeleton
-                      key={`gallery-load-more-skeleton-${columnIndex}-${index}`}
-                      className="w-full rounded-xl"
-                      style={{
-                        aspectRatio:
-                          skeletonAspectRatios[
-                            (columnIndex + index + initialSkeletonsPerColumn) % skeletonAspectRatios.length
-                          ],
-                      }}
-                    />
-                  ))
-                : null}
-            </div>
-          ))}
-        </div>
+        <GalleryGrid
+          columns={columns}
+          isImageLoaded={isImageLoaded}
+          markImageLoaded={markImageLoaded}
+          registerFigureRef={registerFigureRef}
+          openFromImageId={openFromImageId}
+          isInitialLoading={isInitialLoading}
+          isLoadingMore={isLoadingMore}
+          initialSkeletonsPerColumn={initialSkeletonsPerColumn}
+          loadingMoreSkeletonsPerColumn={loadingMoreSkeletonsPerColumn}
+          skeletonAspectRatios={skeletonAspectRatios}
+          sentinelRef={sentinelRef}
+          hasMore={hasMore}
+          totalImages={images.length}
+        />
 
         {bottomSpacerHeight > 0 ? (
           <div aria-hidden className="w-full" style={{ height: bottomSpacerHeight }} />
-        ) : null}
-
-        <div ref={sentinelRef} className="h-10 w-full" />
-
-        {!hasMore && images.length > 0 ? (
-          <p className="py-6 text-center text-sm text-muted-foreground">You reached the end.</p>
         ) : null}
       </div>
     </section>
