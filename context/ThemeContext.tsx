@@ -38,7 +38,7 @@ export function useTheme(): ThemeContextValue | null {
 
 export function ThemeProvider({
   children,
-  initialIsDark = false,
+  initialIsDark = true,
 }: {
   children: ReactNode;
   initialIsDark?: boolean;

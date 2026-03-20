@@ -36,7 +36,9 @@ export default async function RootLayout({
 }>) {
   const cookieStore = await cookies();
   const themeCookie = cookieStore.get("SBS_preferred_theme");
-  const initialIsDark = themeCookie?.value === "dark";
+  const initialIsDark = themeCookie
+    ? themeCookie.value === "dark"
+    : true;
 
   return (
     <html lang="en" className={cn(initialIsDark ? "dark" : "", "font-sans", geist.variable)}>
