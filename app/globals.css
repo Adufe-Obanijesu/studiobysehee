@@ -127,6 +127,10 @@
 @layer base {
   * {
     @apply text-foreground;
+    scrollbar-width: none;
+  }
+  *::-webkit-scrollbar {
+    display: none;
   }
   body {
     @apply bg-background text-foreground font-dm;

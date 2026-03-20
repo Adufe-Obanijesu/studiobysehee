@@ -2,7 +2,10 @@
 
 import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
+import { GalleryLightbox } from "./GalleryLightbox";
+import { useGalleryFocus } from "@/hooks/useGalleryFocus";
 import { useGalleryImageLoading } from "@/hooks/useGalleryImageLoading";
+import { useGalleryViewportPresence } from "@/hooks/useGalleryViewportPresence";
 import { useGalleryMasonry } from "@/hooks/useGalleryMasonry";
 import { useGalleryVirtualization } from "@/hooks/useGalleryVirtualization";
 import type { GalleryProps } from "./types";
@@ -14,6 +17,19 @@ export default function Gallery({
   hasMore,
   loadMore,
 }: GalleryProps) {
+  const { registerFigureRef, getFigureElement } = useGalleryViewportPresence();
+
+  const {
+    isOpen,
+    activeImage,
+    isLightboxImageLoaded,
+    markLightboxImageLoaded,
+    backdropRef,
+    contentWrapperRef,
+    openFromImageId,
+    close,
+  } = useGalleryFocus({ images, getFigureElement });
+
   const { containerRef, visibleImages, topSpacerHeight, bottomSpacerHeight } =
     useGalleryVirtualization(images);
 
@@ -32,6 +48,16 @@ export default function Gallery({
 
   return (
     <section ref={containerRef} className="w-full px-4 py-4 md:px-6">
+      <GalleryLightbox
+        isOpen={isOpen}
+        activeImage={activeImage}
+        onClose={close}
+        backdropRef={backdropRef}
+        contentWrapperRef={contentWrapperRef}
+        isLightboxImageLoaded={isLightboxImageLoaded}
+        onImageLoad={markLightboxImageLoaded}
+      />
+
       <div>
         {topSpacerHeight > 0 ? (
           <div aria-hidden className="w-full" style={{ height: topSpacerHeight }} />
@@ -41,7 +67,11 @@ export default function Gallery({
           {columns.map((column, columnIndex) => (
             <div key={`column-${columnIndex}`} className="flex flex-col gap-4">
               {column.map((image) => (
-                <figure key={image.id} className="relative overflow-hidden rounded-xl bg-muted/20">
+                <figure
+                  key={image.id}
+                  ref={registerFigureRef(image.id)}
+                  className="relative overflow-hidden rounded-xl bg-muted/20"
+                >
                   <Skeleton className="pointer-events-none absolute inset-0 z-0 rounded-none" />
                   <Image
                     src={image.src}
@@ -56,6 +86,12 @@ export default function Gallery({
                     onLoad={() => {
                       markImageLoaded(image.id);
                     }}
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-0 z-20 cursor-pointer rounded-xl bg-transparent"
+                    aria-label={`Open image: ${image.alt || "Gallery image"}`}
+                    onClick={() => openFromImageId(image.id)}
                   />
                 </figure>
               ))}
