@@ -8,7 +8,6 @@ import { HiOutlineMenu, HiOutlineX } from "react-icons/hi";
 import { useNavLinkHover, useNavbar } from "@/hooks/useNavbar";
 import type { NavLink, SocialLink } from "@/data/navbar";
 import { cn } from "@/lib/utils";
-import { useBookSessionButtonDebug } from "@/hooks/useBookSessionButtonDebug";
 import {
   Tooltip,
   TooltipContent,
@@ -51,12 +50,10 @@ function AnimatedNavLink({ link }: { link: NavLink }) {
 }
 
 function BookSessionButton() {
-  const { buttonRef } = useBookSessionButtonDebug();
 
   return (
     <Link
       href="/book"
-      ref={buttonRef}
       className="block group relative ml-1 overflow-hidden rounded-md bg-primary lg:px-4 lg:py-2 px-8 py-4 lg:text-sm font-medium text-background text-center lg:text-left"
     >
       <span
