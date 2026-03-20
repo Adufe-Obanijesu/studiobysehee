@@ -1,11 +1,11 @@
 "use client";
 
 import Gallery from "@/components/Gallery";
-import { useFashionBeautyGalleryQuery } from "@/hooks/useFashionBeautyGalleryQuery";
+import { usePeopleGalleryQuery } from "@/hooks/usePeopleGalleryQuery";
 
-export default function Home() {
+export default function PeoplePage() {
   const { images, isLoading, isFetchingMore, hasMore, loadMore } =
-    useFashionBeautyGalleryQuery();
+    usePeopleGalleryQuery();
 
   return (
     <Gallery

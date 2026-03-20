@@ -1,4 +1,5 @@
 import peopleJson from "@/data/people.json";
+import fashionBeautyJson from "@/data/fashion_beauty.json";
 import { PAGE_SIZE } from "@/components/Gallery/constants";
 import type { GalleryImage, GalleryPage } from "@/components/Gallery/types";
 
@@ -45,4 +46,8 @@ export const createLocalPageFetcher = (rawJson: LocalGalleryJsonItem[]) => {
 
 export const fetchPeopleGalleryPage = createLocalPageFetcher(
   peopleJson as LocalGalleryJsonItem[],
+);
+
+export const fetchFashionBeautyGalleryPage = createLocalPageFetcher(
+  fashionBeautyJson as LocalGalleryJsonItem[],
 );
