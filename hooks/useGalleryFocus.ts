@@ -36,7 +36,10 @@ export function useGalleryFocus({
   const backdropRef = useRef<HTMLDivElement | null>(null);
   const contentWrapperRef = useRef<HTMLDivElement | null>(null);
   const closeCursorRef = useRef<HTMLDivElement | null>(null);
+  const captionMaskRef = useRef<HTMLDivElement | null>(null);
+  const captionTextRef = useRef<HTMLParagraphElement | null>(null);
   const originRef = useRef({ cx: 0, cy: 0 });
+  const openImageIndexRef = useRef<number | null>(null);
   const openTimelineRef = useRef<gsap.core.Timeline | null>(null);
   const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
   const pendingScrollIndexRef = useRef<number | null>(null);
@@ -66,6 +69,7 @@ export function useGalleryFocus({
       setIsLightboxImageLoaded(false);
       setIsOpen(true);
       setOpenCounter((c) => c + 1);
+      openImageIndexRef.current = index;
     },
     [images],
   );
@@ -178,7 +182,9 @@ export function useGalleryFocus({
 
       const backdrop = backdropRef.current;
       const content = contentWrapperRef.current;
-      if (!backdrop || !content) return;
+      const captionMask = captionMaskRef.current;
+      const captionText = captionTextRef.current;
+      if (!backdrop || !content || !captionMask || !captionText) return;
 
       gsap.killTweensOf([backdrop, content]);
       openTimelineRef.current?.kill();
@@ -189,6 +195,8 @@ export function useGalleryFocus({
 
       gsap.set(backdrop, { opacity: 0 });
       gsap.set(content, { scale: 0.4, transformOrigin: `${cx}px ${cy}px` });
+      gsap.set(captionMask, { autoAlpha: 0 });
+      gsap.set(captionText, { yPercent: 110, autoAlpha: 0 });
 
       const tl = gsap.timeline();
       openTimelineRef.current = tl;
@@ -197,9 +205,40 @@ export function useGalleryFocus({
         content,
         { scale: 1, duration: 0.5 * d, ease: "power3.out" },
         "<",
+      ).to(
+        captionMask,
+        { autoAlpha: 1, duration: 0.01 },
+        ">-0.02",
+      ).to(
+        captionText,
+        { yPercent: 0, autoAlpha: 1, duration: 0.32 * d, ease: "power3.out" },
+        "<",
       );
     },
     { dependencies: [openCounter] },
+  );
+
+  useGSAP(
+    () => {
+      if (!isOpen) return;
+      if (openImageIndexRef.current === activeIndex) return;
+
+      const captionMask = captionMaskRef.current;
+      const captionText = captionTextRef.current;
+      if (!captionMask || !captionText) return;
+
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const d = reduced ? 0.01 : 1;
+
+      gsap.killTweensOf([captionMask, captionText]);
+      gsap.set(captionMask, { autoAlpha: 1 });
+      gsap.fromTo(
+        captionText,
+        { yPercent: 110, autoAlpha: 0 },
+        { yPercent: 0, autoAlpha: 1, duration: 0.28 * d, ease: "power3.out" },
+      );
+    },
+    { dependencies: [activeIndex, isOpen], revertOnUpdate: true },
   );
 
   useGSAP(
@@ -256,6 +295,8 @@ export function useGalleryFocus({
     backdropRef,
     contentWrapperRef,
     closeCursorRef,
+    captionMaskRef,
+    captionTextRef,
     openFromImageId,
     navigatePrev,
     navigateNext,

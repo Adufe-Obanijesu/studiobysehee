@@ -21,6 +21,8 @@ export type GalleryLightboxProps = {
   backdropRef: RefObject<HTMLDivElement | null>;
   contentWrapperRef: RefObject<HTMLDivElement | null>;
   closeCursorRef: RefObject<HTMLDivElement | null>;
+  captionMaskRef: RefObject<HTMLDivElement | null>;
+  captionTextRef: RefObject<HTMLParagraphElement | null>;
   isLightboxImageLoaded: boolean;
   lightboxSizes: string;
   onImageLoad: () => void;
@@ -40,6 +42,8 @@ export function GalleryLightbox({
   backdropRef,
   contentWrapperRef,
   closeCursorRef,
+  captionMaskRef,
+  captionTextRef,
   isLightboxImageLoaded,
   lightboxSizes,
   onImageLoad,
@@ -115,25 +119,39 @@ export function GalleryLightbox({
         className="pointer-events-none absolute inset-0 flex items-center justify-center px-4 py-16"
       >
         <div
-          className="pointer-events-auto relative overflow-hidden rounded-xl"
+          className="pointer-events-auto flex flex-col gap-3"
           style={{
             width: `min(100%, calc(85dvh * (${activeImage.width} / ${activeImage.height})), 64rem)`,
-            aspectRatio: `${activeImage.width} / ${activeImage.height}`,
-            maxHeight: "85dvh",
           }}
         >
-          <Skeleton className="absolute inset-0 rounded-xl" />
-          <Image
-            fill
-            src={activeImage.src}
-            alt={activeImage.alt || "Gallery image"}
-            className={`relative z-10 object-contain transition-opacity duration-300 ${
-              isLightboxImageLoaded ? "opacity-100" : "opacity-0"
-            }`}
-            sizes={lightboxSizes}
-            priority
-            onLoad={onImageLoad}
-          />
+          <div
+            className="relative overflow-hidden rounded-xl"
+            style={{
+              aspectRatio: `${activeImage.width} / ${activeImage.height}`,
+              maxHeight: "85dvh",
+            }}
+          >
+            <Skeleton className="absolute inset-0 rounded-xl" />
+            <Image
+              fill
+              src={activeImage.src}
+              alt={activeImage.alt || "Gallery image"}
+              className={`relative z-10 object-contain transition-opacity duration-300 ${
+                isLightboxImageLoaded ? "opacity-100" : "opacity-0"
+              }`}
+              sizes={lightboxSizes}
+              priority
+              onLoad={onImageLoad}
+            />
+          </div>
+          <div ref={captionMaskRef} className="overflow-hidden">
+            <p
+              ref={captionTextRef}
+              className="text-sm text-foreground/90 md:text-base text-center"
+            >
+              {activeImage.alt || "Gallery image"}
+            </p>
+          </div>
         </div>
       </div>
     </div>

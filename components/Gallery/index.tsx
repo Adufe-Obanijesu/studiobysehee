@@ -35,6 +35,8 @@ export default function Gallery({
     backdropRef,
     contentWrapperRef,
     closeCursorRef,
+    captionMaskRef,
+    captionTextRef,
     openFromImageId,
     navigatePrev,
     navigateNext,
@@ -80,6 +82,8 @@ export default function Gallery({
         backdropRef={backdropRef}
         contentWrapperRef={contentWrapperRef}
         closeCursorRef={closeCursorRef}
+        captionMaskRef={captionMaskRef}
+        captionTextRef={captionTextRef}
         isLightboxImageLoaded={isLightboxImageLoaded}
         lightboxSizes={lightboxSizes}
         onImageLoad={markLightboxImageLoaded}
