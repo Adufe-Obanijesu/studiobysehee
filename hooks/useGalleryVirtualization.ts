@@ -13,7 +13,6 @@ export function useGalleryVirtualization(images: GalleryImage[]) {
   const [containerWidth, setContainerWidth] = useState(0);
 
   const startsRef = useRef<number[]>([]);
-  const containerTopRef = useRef(0);
 
   useEffect(() => {
     let rafId = 0;
@@ -31,7 +30,6 @@ export function useGalleryVirtualization(images: GalleryImage[]) {
         prev === innerHeight ? prev : innerHeight,
       );
       setScrollY((prev) => (prev === currentScrollY ? prev : currentScrollY));
-      containerTopRef.current = nextContainerTop;
       setContainerTop((prev) =>
         Math.abs(prev - nextContainerTop) < 1 ? prev : nextContainerTop,
       );
@@ -184,8 +182,14 @@ export function useGalleryVirtualization(images: GalleryImage[]) {
 
   const scrollToIndex = useCallback((index: number) => {
     const top = startsRef.current[index];
-    if (top === undefined) return;
-    window.scrollTo({ top: containerTopRef.current + top, behavior: "instant" });
+    const container = containerRef.current;
+    if (top === undefined || !container) return;
+    const containerTop = window.scrollY + container.getBoundingClientRect().top;
+    const SCROLL_OFFSET_PX = 200;
+    window.scrollTo({
+      top: Math.max(0, containerTop + top - SCROLL_OFFSET_PX),
+      behavior: "smooth",
+    });
   }, []);
 
   return {
