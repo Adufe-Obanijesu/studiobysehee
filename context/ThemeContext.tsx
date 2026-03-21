@@ -11,6 +11,8 @@ import {
 import Navbar from "@/components/Navbar";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import Footer from "@/components/Footer";
+import { usePathname } from "next/navigation";
 
 const COOKIE_NAME = "SBS_preferred_theme";
 const CIRCLE_DURATION = 0.6;
@@ -43,6 +45,7 @@ export function ThemeProvider({
   children: ReactNode;
   initialIsDark?: boolean;
 }) {
+  const pathname = usePathname();
   const [isDark, setIsDark] = useState(initialIsDark);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const circleRef = useRef<HTMLDivElement>(null);
@@ -108,6 +111,7 @@ export function ThemeProvider({
         <div className="relative z-10">
           <Navbar />
           {children}
+          {pathname !== "/about" && <Footer />}
         </div>
       </main>
     </ThemeContext.Provider>
