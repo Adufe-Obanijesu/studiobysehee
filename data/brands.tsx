@@ -28,7 +28,7 @@ export type BrandSvgComponent = React.FC<React.SVGProps<SVGSVGElement>>;
 export const brands: { alt: string; Svg: BrandSvgComponent }[] = [
   { alt: "Google", Svg: SVGGoogle },
   // { alt: "Kuzco", Svg: Kuzco },
-  { alt: "Baby Jorn", Svg: SvgBabyjorn },
+  { alt: "BabyBJorn", Svg: SvgBabyjorn },
   { alt: "Papyrus", Svg: Papyrus },
   { alt: "Wells Fargo", Svg: SvgWellsFargo },
   { alt: "Blackpink", Svg: SvgBlackpink },

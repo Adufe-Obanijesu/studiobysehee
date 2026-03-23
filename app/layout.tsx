@@ -15,6 +15,7 @@ const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
   display: "swap",
 });
 
