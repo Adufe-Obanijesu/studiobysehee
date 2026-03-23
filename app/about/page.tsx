@@ -38,9 +38,10 @@ export default function About() {
             Selected Clients
           </span>
           <ul className="grid grid-cols-2">
-            {ABOUT_CLIENTS.map((client, index) => (
+            {ABOUT_CLIENTS.map((client) => (
               <li
                 key={client}
+                data-client-item
                 className={cn("font-dm text-sm uppercase tracking-wide text-foreground font-medium", client === "Rockefeller Center" && "col-span-2")}
               >
                 {client}
