@@ -16,6 +16,8 @@ export function useAbout() {
       const info = infoRef.current;
       if (!heading || !info) return;
       const clientItems = gsap.utils.toArray<HTMLElement>("[data-client-item]");
+      const touchLinks = gsap.utils.toArray<HTMLAnchorElement>("[data-about-link]");
+      const removeTouchLinkListeners: Array<() => void> = [];
 
       const split = new SplitText(heading, {
         type: "lines",
@@ -64,7 +66,44 @@ export function useAbout() {
         }, "<=40%");
       }
 
+      // Link underline interaction:
+      // - hover: line exits to the right
+      // - mouse leave: line jumps off-screen left, then enters from left
+      for (const link of touchLinks) {
+        gsap.set(link, { "--link-underline-x": "0%" });
+
+        const handleEnter = () => {
+          gsap.killTweensOf(link);
+          gsap.to(link, {
+            "--link-underline-x": "100%",
+            duration: 0.32,
+            ease: "power2.out",
+          });
+        };
+
+        const handleLeave = () => {
+          gsap.killTweensOf(link);
+          gsap.set(link, { "--link-underline-x": "-100%" });
+          gsap.to(link, {
+            "--link-underline-x": "0%",
+            duration: 0.32,
+            ease: "power2.out",
+          });
+        };
+
+        link.addEventListener("mouseenter", handleEnter);
+        link.addEventListener("mouseleave", handleLeave);
+
+        removeTouchLinkListeners.push(() => {
+          link.removeEventListener("mouseenter", handleEnter);
+          link.removeEventListener("mouseleave", handleLeave);
+        });
+      }
+
       return () => {
+        for (const removeListener of removeTouchLinkListeners) {
+          removeListener();
+        }
         split.revert();
       };
     },

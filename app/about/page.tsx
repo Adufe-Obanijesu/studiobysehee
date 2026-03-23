@@ -58,24 +58,33 @@ export default function About() {
           <div className="flex flex-col gap-4 font-medium">
             <Link
               href={`mailto:${ABOUT_CONTACT.email}`}
-              className="text-sm uppercase tracking-wide text-foreground underline underline-offset-2 decoration-foreground/30 hover:decoration-foreground transition-colors duration-200"
+              data-about-link
+              className="about-touch-link w-fit text-sm uppercase tracking-wide text-foreground transition-colors duration-200"
             >
               {ABOUT_CONTACT.email}
             </Link>
-            <span className="font-dm text-sm uppercase tracking-wide text-foreground">
-              {ABOUT_CONTACT.phone}
-            </span>
+            <Link
+              href={ABOUT_CONTACT.phone.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-about-link
+              className="about-touch-link w-fit font-dm text-sm uppercase tracking-wide text-foreground transition-colors duration-200"
+            >
+              {ABOUT_CONTACT.phone.label}
+            </Link>
             <Link
               href={ABOUT_CONTACT.instagram.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-dm text-sm uppercase tracking-wide text-foreground underline underline-offset-2 decoration-foreground/30 hover:decoration-foreground transition-colors duration-200"
+              data-about-link
+              className="about-touch-link w-fit font-dm text-sm uppercase tracking-wide text-foreground transition-colors duration-200"
             >
               {ABOUT_CONTACT.instagram.label}
             </Link>
             <Link
               href={ABOUT_CONTACT.siteCredits.href}
-              className="font-dm text-sm uppercase tracking-wide text-foreground underline underline-offset-2 decoration-foreground/30 hover:decoration-foreground transition-colors duration-200"
+              data-about-link
+              className="about-touch-link w-fit font-dm text-sm uppercase tracking-wide text-foreground transition-colors duration-200"
             >
               {ABOUT_CONTACT.siteCredits.label}
             </Link>

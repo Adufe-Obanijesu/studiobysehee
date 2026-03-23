@@ -25,7 +25,10 @@ export const ABOUT_CLIENTS = [
 
 export const ABOUT_CONTACT = {
   email: "hello@studiobysehee.com",
-  phone: "+1 (212) 555 0147",
+  phone: {
+    label: "+1 (212) 555 0147",
+    href: "tel:+12125550147",
+  },
   instagram: {
     label: "Instagram",
     href: "http://www.instagram.com/sehee_in_newyork",

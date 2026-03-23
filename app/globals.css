@@ -160,4 +160,24 @@
     border-radius: 9999px;
     transform-origin: center center;
   }
+
+  .about-touch-link {
+    --link-underline-x: 0%;
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    padding-bottom: 2px;
+  }
+
+  .about-touch-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 4px;
+    height: 1px;
+    background: color-mix(in oklch, currentColor 40%, transparent);
+    transform: translateX(var(--link-underline-x));
+    will-change: transform;
+  }
 }
