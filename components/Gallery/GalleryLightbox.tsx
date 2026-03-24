@@ -133,6 +133,8 @@ export function GalleryLightbox({
               }`}
               sizes={lightboxSizes}
               priority
+              unoptimized
+              loading="eager"
               onLoad={onImageLoad}
             />
           </div>

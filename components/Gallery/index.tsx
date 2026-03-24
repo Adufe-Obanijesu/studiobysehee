@@ -1,10 +1,13 @@
 "use client";
 
+import { useCallback } from "react";
 import { GalleryLightbox } from "./GalleryLightbox";
 import { GalleryGrid } from "./GalleryGrid";
 import { useGalleryFocus } from "@/hooks/useGalleryFocus";
 import { useGalleryViewportPresence } from "@/hooks/useGalleryViewportPresence";
+import { useGalleryImageLoading } from "@/hooks/useGalleryImageLoading";
 import { useGalleryMasonry } from "@/hooks/useGalleryMasonry";
+import { useGalleryMasonryItemRenderer } from "@/hooks/useGalleryMasonryItemRenderer";
 import { useGallerySkeletonLayout } from "@/hooks/useGallerySkeletonLayout";
 import type { GalleryProps } from "./types";
 
@@ -17,8 +20,21 @@ export default function Gallery({
 }: GalleryProps) {
   const { registerFigureRef, getFigureElement } = useGalleryViewportPresence();
 
-  const { columns, columnCount, columnVirtuosoRefs, sentinelRef, scrollToIndex } =
-    useGalleryMasonry({ images, hasMore, isFetchingMore, loadMore });
+  const {
+    columnCount,
+    columnsReady,
+    scrollToIndex,
+    masonryScrollToIndex,
+    onMasonryRender,
+  } = useGalleryMasonry({
+    images,
+    hasMore,
+    isFetchingMore,
+    loadMore,
+  });
+
+  const { isImageLoaded, markImageLoaded: markGridImageLoaded } =
+    useGalleryImageLoading(images);
 
   const {
     isOpen,
@@ -39,28 +55,41 @@ export default function Gallery({
     onPointerUp,
     onPointerCancel,
     close,
+    notifyGridImageLoaded,
   } = useGalleryFocus({
     images,
     getFigureElement,
+    isImageLoaded,
     hasMore,
     isFetchingMore,
     loadMore,
     scrollToIndex,
   });
 
-  const {
-    initialSkeletonsPerColumn,
-    loadingMoreSkeletonsPerColumn,
-    estimatedItemHeight,
-    initialItemsPerColumn,
-    skeletonAspectRatios,
-  } = useGallerySkeletonLayout({ columnCount });
+  const markImageLoaded = useCallback(
+    (id: number) => {
+      markGridImageLoaded(id);
+      notifyGridImageLoaded(id);
+    },
+    [markGridImageLoaded, notifyGridImageLoaded],
+  );
 
-  const isInitialLoading = images.length === 0;
+  const renderMasonryItem = useGalleryMasonryItemRenderer({
+    isImageLoaded,
+    markImageLoaded,
+    registerFigureRef,
+    openFromImageId,
+  });
+
+  const { initialSkeletonsPerColumn, loadingMoreSkeletonsPerColumn, skeletonAspectRatios } =
+    useGallerySkeletonLayout({
+      columnCount,
+    });
+  const isInitialLoading = isLoading && images.length === 0;
   const isLoadingMore = isFetchingMore && images.length > 0;
 
   return (
-    <section className="w-full px-4 py-4 md:px-6">
+    <section className="min-h-[calc(100dvh-3.5rem)] w-full px-4 py-4 md:px-6">
       <GalleryLightbox
         isOpen={isOpen}
         activeImage={activeImage}
@@ -82,18 +111,17 @@ export default function Gallery({
       />
 
       <GalleryGrid
-        columns={columns}
-        columnVirtuosoRefs={columnVirtuosoRefs}
-        registerFigureRef={registerFigureRef}
-        openFromImageId={openFromImageId}
+        images={images}
+        columnCount={columnCount}
+        columnsReady={columnsReady}
+        masonryScrollToIndex={masonryScrollToIndex}
+        renderMasonryItem={renderMasonryItem}
+        onMasonryRender={onMasonryRender}
         isInitialLoading={isInitialLoading}
         isLoadingMore={isLoadingMore}
         initialSkeletonsPerColumn={initialSkeletonsPerColumn}
         loadingMoreSkeletonsPerColumn={loadingMoreSkeletonsPerColumn}
-        defaultItemHeight={estimatedItemHeight}
-        initialItemsPerColumn={initialItemsPerColumn}
         skeletonAspectRatios={skeletonAspectRatios}
-        sentinelRef={sentinelRef}
         hasMore={hasMore}
         totalImages={images.length}
       />

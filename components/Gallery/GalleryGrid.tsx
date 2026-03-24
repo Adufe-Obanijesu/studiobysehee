@@ -1,115 +1,119 @@
 "use client";
 
 import { memo } from "react";
-import type { MutableRefObject, RefObject } from "react";
-import { Virtuoso, type VirtuosoHandle } from "react-virtuoso";
+import type { ComponentType } from "react";
+import { Masonry } from "masonic";
+import type { RenderComponentProps } from "masonic";
 import { Skeleton } from "@/components/ui/skeleton";
-import { GalleryGridItem } from "./GalleryGridItem";
 import type { GalleryImage } from "./types";
 
 type GalleryGridProps = {
-  columns: GalleryImage[][];
-  columnVirtuosoRefs: MutableRefObject<(VirtuosoHandle | null)[]>;
-  registerFigureRef: (id: number) => (el: HTMLElement | null) => void;
-  openFromImageId: (id: number) => void;
+  images: GalleryImage[];
+  columnCount: number;
+  columnsReady: boolean;
+  masonryScrollToIndex: number | undefined;
+  renderMasonryItem: ComponentType<RenderComponentProps<GalleryImage>>;
+  onMasonryRender: (startIndex: number, stopIndex: number, items: GalleryImage[]) => void;
   isInitialLoading: boolean;
   isLoadingMore: boolean;
   initialSkeletonsPerColumn: number;
   loadingMoreSkeletonsPerColumn: number;
-  defaultItemHeight: number;
-  initialItemsPerColumn: number;
   skeletonAspectRatios: readonly number[];
-  sentinelRef: RefObject<HTMLDivElement | null>;
   hasMore: boolean;
   totalImages: number;
 };
 
 export const GalleryGrid = memo(function GalleryGrid({
-  columns,
-  columnVirtuosoRefs,
-  registerFigureRef,
-  openFromImageId,
+  images,
+  columnCount,
+  columnsReady,
+  masonryScrollToIndex,
+  renderMasonryItem,
+  onMasonryRender,
   isInitialLoading,
   isLoadingMore,
   initialSkeletonsPerColumn,
   loadingMoreSkeletonsPerColumn,
-  defaultItemHeight,
-  initialItemsPerColumn,
   skeletonAspectRatios,
-  sentinelRef,
   hasMore,
   totalImages,
 }: GalleryGridProps) {
-  return (
-    <>
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
-        {columns.map((columnImages, columnIndex) => (
-          <div key={`column-${columnIndex}`}>
-            {isInitialLoading ? (
-              <div className="flex flex-col gap-4">
-                {Array.from({ length: initialSkeletonsPerColumn }, (_, index) => (
-                  <Skeleton
-                    key={`gallery-initial-skeleton-${columnIndex}-${index}`}
-                    className="w-full rounded-xl"
-                    style={{
-                      aspectRatio:
-                        skeletonAspectRatios[
-                          (columnIndex + index) % skeletonAspectRatios.length
-                        ],
-                    }}
-                  />
-                ))}
-              </div>
-            ) : (
-              <Virtuoso
-                ref={(el) => {
-                  columnVirtuosoRefs.current[columnIndex] = el;
-                }}
-                useWindowScroll
-                totalCount={
-                  columnImages.length +
-                  (isLoadingMore ? loadingMoreSkeletonsPerColumn : 0)
-                }
-                defaultItemHeight={defaultItemHeight}
-                initialItemCount={Math.min(initialItemsPerColumn, columnImages.length)}
-                overscan={200}
-                itemContent={(index) => {
-                  const image = columnImages[index];
-                  return (
-                    <div className="pb-4">
-                      {image ? (
-                        <GalleryGridItem
-                          image={image}
-                          registerFigureRef={registerFigureRef}
-                          openFromImageId={openFromImageId}
-                        />
-                      ) : (
-                        <Skeleton
-                          className="w-full rounded-xl"
-                          style={{
-                            aspectRatio:
-                              skeletonAspectRatios[
-                                (columnIndex + (index - columnImages.length)) %
-                                  skeletonAspectRatios.length
-                              ],
-                          }}
-                        />
-                      )}
-                    </div>
-                  );
+  if (!columnsReady) {
+    return (
+      <div
+        className="w-full"
+        aria-busy
+        aria-label="Preparing gallery layout"
+      />
+    );
+  }
+
+  if (isInitialLoading) {
+    return (
+      <div
+        className="grid gap-4"
+        style={{ gridTemplateColumns: `repeat(${Math.max(1, columnCount)}, minmax(0, 1fr))` }}
+      >
+        {Array.from({ length: Math.max(1, columnCount) }, (_, columnIndex) => (
+          <div key={`gallery-initial-column-${columnIndex}`} className="flex flex-col gap-4">
+            {Array.from({ length: initialSkeletonsPerColumn }, (_, index) => (
+              <Skeleton
+                key={`gallery-initial-skeleton-${columnIndex}-${index}`}
+                className="w-full rounded-xl"
+                style={{
+                  aspectRatio:
+                    skeletonAspectRatios[(columnIndex + index) % skeletonAspectRatios.length],
                 }}
               />
-            )}
+            ))}
           </div>
         ))}
       </div>
+    );
+  }
 
-      <div ref={sentinelRef} className="h-10 w-full" />
+  return (
+    <>
+      <Masonry<GalleryImage>
+        items={images}
+        render={renderMasonryItem}
+        columnGutter={16}
+        rowGutter={16}
+        columnCount={Math.max(1, columnCount)}
+        itemKey={(data) => data.id}
+        onRender={onMasonryRender}
+        scrollToIndex={
+          masonryScrollToIndex === undefined
+            ? undefined
+            : { index: masonryScrollToIndex, align: "center" as const }
+        }
+        overscanBy={2}
+      />
+
+      {isLoadingMore ? (
+        <div
+          className="mt-4 grid gap-4"
+          style={{
+            gridTemplateColumns: `repeat(${Math.max(1, columnCount)}, minmax(0, 1fr))`,
+          }}
+        >
+          {Array.from({ length: Math.max(1, columnCount) * loadingMoreSkeletonsPerColumn }, (_, index) => (
+            <Skeleton
+              key={`gallery-load-more-skeleton-${index}`}
+              className="w-full rounded-xl"
+              style={{
+                aspectRatio:
+                  skeletonAspectRatios[
+                    (index + initialSkeletonsPerColumn * columnCount) % skeletonAspectRatios.length
+                  ],
+              }}
+            />
+          ))}
+        </div>
+      ) : null}
 
       {!hasMore && totalImages > 0 ? (
-        <p className="py-6 text-center text-sm text-muted-foreground">
-          You reached the end.
-        </p>
+        <p className="py-6 text-center text-sm text-muted-foreground">You reached the end.</p>
       ) : null}
     </>
   );

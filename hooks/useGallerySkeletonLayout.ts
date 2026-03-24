@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { getResponsiveGalleryConfig } from "@/components/Gallery/constants";
 
 type Params = {
-  columnCount: number;
+  columnCount?: number;
 };
 
 const SKELETON_ASPECT_RATIOS = [0.75, 1.2, 0.9];
@@ -31,9 +32,11 @@ export function useGallerySkeletonLayout({ columnCount }: Params) {
   }, []);
 
   const layout = useMemo(() => {
-    const safeColumnCount = Math.max(1, columnCount);
     const safeViewportWidth = Math.max(320, viewportWidth || 320);
     const safeViewportHeight = Math.max(640, viewportHeight || 640);
+    const responsiveColumnCount =
+      columnCount ?? getResponsiveGalleryConfig(safeViewportWidth).columnCount;
+    const safeColumnCount = Math.max(1, responsiveColumnCount);
     const sidePadding = getSidePadding(safeViewportWidth);
     const contentWidth = Math.max(320, safeViewportWidth - sidePadding * 2);
     const columnWidth =
@@ -51,13 +54,11 @@ export function useGallerySkeletonLayout({ columnCount }: Params) {
       1,
       Math.min(3, Math.ceil(initialSkeletonsPerColumn * 0.34)),
     );
-    const initialItemsPerColumn = Math.max(4, Math.ceil(rowsToOverflowViewport * 1.1));
 
     return {
+      columnCount: safeColumnCount,
       initialSkeletonsPerColumn,
       loadingMoreSkeletonsPerColumn,
-      estimatedItemHeight,
-      initialItemsPerColumn,
       skeletonAspectRatios: SKELETON_ASPECT_RATIOS,
     };
   }, [columnCount, viewportHeight, viewportWidth]);

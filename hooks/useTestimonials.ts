@@ -24,9 +24,8 @@ export function useTestimonials() {
       if (!cards.length) return;
 
       cards.forEach((card) => {
-        gsap.fromTo(
+        gsap.to(
           card,
-          { autoAlpha: 0, y: 24 },
           {
             autoAlpha: 1,
             y: 0,
@@ -35,7 +34,7 @@ export function useTestimonials() {
             overwrite: "auto",
             scrollTrigger: {
               trigger: card,
-              start: "top 92%",
+              start: "top 98%",
               once: true,
             },
           }

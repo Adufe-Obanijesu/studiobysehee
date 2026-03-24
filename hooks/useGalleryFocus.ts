@@ -11,9 +11,62 @@ gsap.registerPlugin(useGSAP);
 const SWIPE_THRESHOLD_PX = 50;
 const PAGINATION_PREFETCH_DISTANCE = 5;
 
+const FIGURE_SETTLE_SCALE = 1.035;
+const FIGURE_SETTLE_UP_DURATION = 0.32;
+const FIGURE_SETTLE_DOWN_DURATION = 0.48;
+const FIGURE_SETTLE_MAX_RAF_RETRIES = 8;
+/** If grid `onLoad` never fires, still run settle so the user gets feedback. */
+const FIGURE_SETTLE_LOAD_FALLBACK_MS = 3500;
+
+function playGalleryFigureSettle(target: HTMLElement | null) {
+  if (!target) return;
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  gsap.killTweensOf(target);
+  if (reduced) {
+    gsap.set(target, { clearProps: "transform" });
+    return;
+  }
+  gsap.set(target, { transformOrigin: "50% 50%", scale: 1 });
+  gsap
+    .timeline({
+      onComplete: () => {
+        gsap.set(target, { clearProps: "transform" });
+      },
+    })
+    .to(target, {
+      delay: .5,
+      scale: FIGURE_SETTLE_SCALE,
+      duration: FIGURE_SETTLE_UP_DURATION,
+      ease: "power2.out",
+    })
+    .to(target, {
+      scale: 1,
+      duration: FIGURE_SETTLE_DOWN_DURATION,
+      ease: "power3.out",
+    });
+}
+
+function scheduleGalleryFigureSettle(getTarget: () => HTMLElement | null) {
+  const run = (attempt: number) => {
+    const el = getTarget();
+    if (el) {
+      playGalleryFigureSettle(el);
+      return;
+    }
+    if (attempt < FIGURE_SETTLE_MAX_RAF_RETRIES) {
+      requestAnimationFrame(() => run(attempt + 1));
+    }
+  };
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => run(0));
+  });
+}
+
 type Params = {
   images: GalleryImage[];
   getFigureElement: (imageId: number) => HTMLElement | null;
+  /** Grid thumbnail load state; keep current via ref inside this hook. */
+  isImageLoaded: (imageId: number) => boolean;
   hasMore: boolean;
   isFetchingMore: boolean;
   loadMore: () => void;
@@ -23,6 +76,7 @@ type Params = {
 export function useGalleryFocus({
   images,
   getFigureElement,
+  isImageLoaded,
   hasMore,
   isFetchingMore,
   loadMore,
@@ -41,7 +95,11 @@ export function useGalleryFocus({
   const openImageIndexRef = useRef<number | null>(null);
   const openTimelineRef = useRef<gsap.core.Timeline | null>(null);
   const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
-  const pendingScrollIndexRef = useRef<number | null>(null);
+  /** Captured when lightbox opens; used to restore scroll before masonry scroll + close. */
+  const bodyOverflowBeforeLightboxRef = useRef("");
+  /** Defer figure settle until grid thumb `onLoad` when thumb was not yet loaded. */
+  const pendingSettleImageIdRef = useRef<number | null>(null);
+  const settleFallbackTimeoutRef = useRef<number | null>(null);
 
   // Always-current refs to avoid stale closures in stable callbacks
   const activeIndexRef = useRef(activeIndex);
@@ -52,11 +110,62 @@ export function useGalleryFocus({
   getFigureElementRef.current = getFigureElement;
   const imagesRef = useRef(images);
   imagesRef.current = images;
+  const isImageLoadedRef = useRef(isImageLoaded);
+  isImageLoadedRef.current = isImageLoaded;
+
+  const clearFigureSettleFallback = useCallback(() => {
+    const t = settleFallbackTimeoutRef.current;
+    if (t != null) {
+      clearTimeout(t);
+      settleFallbackTimeoutRef.current = null;
+    }
+  }, []);
+
+  const resetPendingFigureSettle = useCallback(() => {
+    pendingSettleImageIdRef.current = null;
+    clearFigureSettleFallback();
+  }, [clearFigureSettleFallback]);
+
+  const tryFigureSettleAfterClose = useCallback(
+    (closedAtIndex: number) => {
+      const id = imagesRef.current[closedAtIndex]?.id;
+      if (id == null) return;
+
+      clearFigureSettleFallback();
+      pendingSettleImageIdRef.current = null;
+
+      if (isImageLoadedRef.current(id)) {
+        scheduleGalleryFigureSettle(() => getFigureElementRef.current(id));
+        return;
+      }
+
+      pendingSettleImageIdRef.current = id;
+      settleFallbackTimeoutRef.current = window.setTimeout(() => {
+        settleFallbackTimeoutRef.current = null;
+        if (pendingSettleImageIdRef.current !== id) return;
+        pendingSettleImageIdRef.current = null;
+        scheduleGalleryFigureSettle(() => getFigureElementRef.current(id));
+      }, FIGURE_SETTLE_LOAD_FALLBACK_MS);
+    },
+    [clearFigureSettleFallback],
+  );
+
+  const notifyGridImageLoaded = useCallback(
+    (imageId: number) => {
+      if (pendingSettleImageIdRef.current !== imageId) return;
+      pendingSettleImageIdRef.current = null;
+      clearFigureSettleFallback();
+      scheduleGalleryFigureSettle(() => getFigureElementRef.current(imageId));
+    },
+    [clearFigureSettleFallback],
+  );
 
   const openFromImageId = useCallback(
     (imageId: number) => {
       const index = images.findIndex((img) => img.id === imageId);
       if (index === -1) return;
+
+      resetPendingFigureSettle();
 
       const el = getFigureElementRef.current(imageId);
       const rect = el?.getBoundingClientRect();
@@ -70,7 +179,7 @@ export function useGalleryFocus({
       setOpenCounter((c) => c + 1);
       openImageIndexRef.current = index;
     },
-    [images],
+    [images, resetPendingFigureSettle],
   );
 
   const navigate = useCallback((direction: 1 | -1) => {
@@ -84,19 +193,32 @@ export function useGalleryFocus({
   const navigateNext = useCallback(() => navigate(1), [navigate]);
 
   const close = useCallback(() => {
-    pendingScrollIndexRef.current = activeIndexRef.current;
-    const tl = openTimelineRef.current;
-    if (tl) {
-      tl.eventCallback("onReverseComplete", () => {
-        setIsOpen(false);
-        openTimelineRef.current = null;
-        tl.eventCallback("onReverseComplete", null);
+    const index = activeIndexRef.current;
+    document.body.style.overflow = bodyOverflowBeforeLightboxRef.current;
+
+    const onClosed = () => {
+      tryFigureSettleAfterClose(index);
+    };
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        scrollToIndexRef.current(index);
+        const tl = openTimelineRef.current;
+        if (tl) {
+          tl.eventCallback("onReverseComplete", () => {
+            setIsOpen(false);
+            openTimelineRef.current = null;
+            tl.eventCallback("onReverseComplete", null);
+            onClosed();
+          });
+          tl.reverse();
+        } else {
+          setIsOpen(false);
+          onClosed();
+        }
       });
-      tl.reverse();
-    } else {
-      setIsOpen(false);
-    }
-  }, []);
+    });
+  }, [tryFigureSettleAfterClose]);
 
   const isLightboxControlTarget = (target: EventTarget | null) =>
     target instanceof Element &&
@@ -158,20 +280,19 @@ export function useGalleryFocus({
   useEffect(() => {
     if (!isOpen) return;
     const prev = document.body.style.overflow;
+    bodyOverflowBeforeLightboxRef.current = prev;
     document.body.style.overflow = "hidden";
     return () => {
-      document.body.style.overflow = prev;
+      document.body.style.overflow = bodyOverflowBeforeLightboxRef.current;
     };
   }, [isOpen]);
 
-  // Scroll restoration — runs AFTER the overflow cleanup above, guaranteeing
-  // the document is scrollable before window.scrollTo is called.
   useEffect(() => {
-    if (isOpen || pendingScrollIndexRef.current === null) return;
-    const index = pendingScrollIndexRef.current;
-    pendingScrollIndexRef.current = null;
-    scrollToIndexRef.current(index);
-  }, [isOpen]);
+    return () => {
+      clearFigureSettleFallback();
+      pendingSettleImageIdRef.current = null;
+    };
+  }, [clearFigureSettleFallback]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -286,5 +407,6 @@ export function useGalleryFocus({
     onPointerUp,
     onPointerCancel,
     close,
+    notifyGridImageLoaded,
   };
 }

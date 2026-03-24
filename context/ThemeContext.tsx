@@ -12,8 +12,7 @@ import Navbar from "@/components/Navbar";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import Footer from "@/components/Footer";
-import { usePathname } from "next/navigation";
-import useLenis from "@/hooks/useLenis";
+// import useLenis from "@/hooks/useLenis";
 
 const COOKIE_NAME = "SBS_preferred_theme";
 const CIRCLE_DURATION = 0.6;
@@ -46,7 +45,6 @@ export function ThemeProvider({
   children: ReactNode;
   initialIsDark?: boolean;
 }) {
-  const pathname = usePathname();
   const [isDark, setIsDark] = useState(initialIsDark);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const circleRef = useRef<HTMLDivElement>(null);
@@ -101,7 +99,7 @@ export function ThemeProvider({
     startThemeTransition,
   };
 
-  useLenis()
+  // useLenis()
 
   return (
     <ThemeContext.Provider value={value}>
@@ -114,7 +112,7 @@ export function ThemeProvider({
         <div className="relative z-10">
           <Navbar />
           {children}
-          {pathname !== "/about" && <Footer />}
+          <Footer />
         </div>
       </main>
     </ThemeContext.Provider>

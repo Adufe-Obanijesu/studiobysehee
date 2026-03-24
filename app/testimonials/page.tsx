@@ -26,7 +26,7 @@ export default function TestimonialsPage() {
         {/* Testimonials Masonry Grid */}
         <div className="columns-1 gap-4 md:columns-2 md:gap-6 lg:columns-3 xl:columns-4 lg:gap-4">
           {(testimonials as Testimonial[]).map((testimonial) => (
-            <Card key={testimonial.id} data-testimonial-card className="mb-6 break-inside-avoid shadow-none lg:mb-4">
+            <Card key={testimonial.id} data-testimonial-card className="mb-6 break-inside-avoid shadow-none lg:mb-4 invisible translate-y-6">
               <CardContent>
                 <div className="flex items-start gap-4">
                     <div className="min-w-0 flex-1">
