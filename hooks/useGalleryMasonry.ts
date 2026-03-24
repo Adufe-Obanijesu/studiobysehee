@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import {
-  getResponsiveGalleryConfig,
-} from "@/components/Gallery/constants";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import type { VirtuosoHandle } from "react-virtuoso";
+import { getResponsiveGalleryConfig } from "@/components/Gallery/constants";
 import type { GalleryImage } from "@/components/Gallery/types";
 
 type Params = {
@@ -13,52 +12,40 @@ type Params = {
   loadMore: () => void;
 };
 
-const getColumnCountFromWidth = (width: number) => {
-  return getResponsiveGalleryConfig(width).columnCount;
-};
-
 const getAspectRatio = (image: GalleryImage) =>
   image.width > 0 ? image.height / image.width : 1;
 
-export function useGalleryMasonry({
-  images,
-  hasMore,
-  isFetchingMore,
-  loadMore,
-}: Params) {
+export function useGalleryMasonry({ images, hasMore, isFetchingMore, loadMore }: Params) {
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const columnVirtuosoRefs = useRef<(VirtuosoHandle | null)[]>([]);
   const [columnCount, setColumnCount] = useState(2);
 
   useLayoutEffect(() => {
-    const updateColumns = () => {
-      setColumnCount(getColumnCountFromWidth(window.innerWidth));
+    const update = () => {
+      setColumnCount(getResponsiveGalleryConfig(window.innerWidth).columnCount);
     };
-
-    updateColumns();
-    window.addEventListener("resize", updateColumns);
-
-    return () => window.removeEventListener("resize", updateColumns);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
   }, []);
 
-  const columns = useMemo(() => {
-    const safeColumnCount = Math.max(1, columnCount);
-    const nextColumns: GalleryImage[][] = Array.from(
-      { length: safeColumnCount },
-      () => [],
-    );
-    const columnHeights = Array.from({ length: safeColumnCount }, () => 0);
+  const { columns, imagePositionMap } = useMemo(() => {
+    const safe = Math.max(1, columnCount);
+    const cols: GalleryImage[][] = Array.from({ length: safe }, () => []);
+    const heights = Array.from({ length: safe }, () => 0);
+    const posMap = new Map<number, { colIndex: number; rowIndex: number }>();
 
     images.forEach((image) => {
-      const targetColumn = columnHeights.reduce(
-        (lowestIndex, currentHeight, index, heights) =>
-          currentHeight < heights[lowestIndex] ? index : lowestIndex,
+      const target = heights.reduce(
+        (lo, h, i, arr) => (h < arr[lo] ? i : lo),
         0,
       );
-      nextColumns[targetColumn].push(image);
-      columnHeights[targetColumn] += getAspectRatio(image);
+      posMap.set(image.id, { colIndex: target, rowIndex: cols[target].length });
+      cols[target].push(image);
+      heights[target] += getAspectRatio(image);
     });
 
-    return nextColumns;
+    return { columns: cols, imagePositionMap: posMap };
   }, [columnCount, images]);
 
   useEffect(() => {
@@ -72,16 +59,32 @@ export function useGalleryMasonry({
         if (!hasMore || isFetchingMore) return;
         loadMore();
       },
-      {
-        root: null,
-        rootMargin: "400px 0px",
-        threshold: 0.01,
-      },
+      { root: null, rootMargin: "400px 0px", threshold: 0.01 },
     );
 
     observer.observe(sentinel);
     return () => observer.disconnect();
   }, [hasMore, isFetchingMore, loadMore]);
 
-  return { sentinelRef, columns, columnCount };
+  const scrollToIndex = useCallback(
+    (globalIndex: number) => {
+      if (globalIndex < 0 || globalIndex >= images.length) return;
+      const image = images[globalIndex];
+      if (!image) return;
+      const pos = imagePositionMap.get(image.id);
+      if (!pos) return;
+      const ref = columnVirtuosoRefs.current[pos.colIndex];
+      if (!ref) return;
+      ref.scrollToIndex({ index: pos.rowIndex, align: "center", behavior: "smooth" });
+    },
+    [images, imagePositionMap],
+  );
+
+  return {
+    columns,
+    columnCount,
+    columnVirtuosoRefs,
+    sentinelRef,
+    scrollToIndex,
+  };
 }

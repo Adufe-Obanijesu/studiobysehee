@@ -17,24 +17,24 @@ export default function useLenis(options = {}) {
   }, []);
 
   useEffect(() => {
-
     const lenis = new Lenis(defaultOptions);
     setLenis(lenis);
 
-    lenis.on("scroll", ScrollTrigger.update);
-
-    gsap.ticker.add((time) => {
+    const onLenisScroll = () => ScrollTrigger.update();
+    const onTick = (time: number) => {
       lenis.raf(time * 1000);
-    });
+    };
+
+    lenis.on("scroll", onLenisScroll);
+
+    gsap.ticker.add(onTick);
 
     gsap.ticker.lagSmoothing(0);
 
     return () => {
+      lenis.off("scroll", onLenisScroll);
       lenis.destroy();
-      gsap.ticker.remove((time) => {
-        lenis.raf(time * 1000);
-      });
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+      gsap.ticker.remove(onTick);
     };
   }, [defaultOptions]);
 

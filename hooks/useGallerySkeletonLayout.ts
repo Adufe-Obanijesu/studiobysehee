@@ -51,10 +51,13 @@ export function useGallerySkeletonLayout({ columnCount }: Params) {
       1,
       Math.min(3, Math.ceil(initialSkeletonsPerColumn * 0.34)),
     );
+    const initialItemsPerColumn = Math.max(4, Math.ceil(rowsToOverflowViewport * 1.1));
 
     return {
       initialSkeletonsPerColumn,
       loadingMoreSkeletonsPerColumn,
+      estimatedItemHeight,
+      initialItemsPerColumn,
       skeletonAspectRatios: SKELETON_ASPECT_RATIOS,
     };
   }, [columnCount, viewportHeight, viewportWidth]);
