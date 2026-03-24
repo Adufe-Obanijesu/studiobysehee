@@ -13,6 +13,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import Footer from "@/components/Footer";
 import { usePathname } from "next/navigation";
+import useLenis from "@/hooks/useLenis";
 
 const COOKIE_NAME = "SBS_preferred_theme";
 const CIRCLE_DURATION = 0.6;
@@ -99,6 +100,8 @@ export function ThemeProvider({
     isTransitioning,
     startThemeTransition,
   };
+
+  useLenis()
 
   return (
     <ThemeContext.Provider value={value}>

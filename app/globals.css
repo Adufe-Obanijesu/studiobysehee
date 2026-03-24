@@ -161,23 +161,16 @@
     transform-origin: center center;
   }
 
-  .about-touch-link {
-    --link-underline-x: 0%;
-    position: relative;
+  .about-name-link {
     display: inline-block;
-    overflow: hidden;
-    padding-bottom: 2px;
+    line-height: inherit;
+    vertical-align: baseline;
+    cursor: pointer;
+    will-change: transform;
   }
 
-  .about-touch-link::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 4px;
-    height: 1px;
-    background: color-mix(in oklch, currentColor 40%, transparent);
-    transform: translateX(var(--link-underline-x));
-    will-change: transform;
+  .about-name-preview {
+    opacity: 0;
+    will-change: transform, opacity;
   }
 }
