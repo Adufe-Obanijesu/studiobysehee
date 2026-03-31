@@ -79,6 +79,7 @@ export default function About() {
     nameRef,
     namePreviewRef,
     overlayRef,
+    overlayCursorCloseRef,
     closeButtonRef,
     previewImageContainerRef,
     isImageLoaded,
@@ -190,6 +191,14 @@ export default function About() {
         aria-label="Portrait of Sehee Kim"
         className="fixed inset-0 z-10003 flex items-center justify-center invisible"
       >
+        <div
+          ref={overlayCursorCloseRef}
+          className="pointer-events-none fixed left-0 top-0 z-20 hidden [@media(hover:hover)]:block text-xs uppercase tracking-[0.2em] text-foreground/90 opacity-0"
+          aria-hidden="true"
+        >
+          Close
+        </div>
+
         {/* Backdrop */}
         <div
           className="absolute inset-0 bg-background/85 backdrop-blur-md cursor-pointer"

@@ -60,18 +60,21 @@ function setInitialVisualStates({
   overlay,
   previewImageContainer,
   namePreview,
+  overlayCursorClose,
 }: {
   info: HTMLDivElement;
   clientItems: HTMLElement[];
   overlay: HTMLDivElement;
   previewImageContainer: HTMLDivElement;
   namePreview: HTMLDivElement;
+  overlayCursorClose: HTMLDivElement;
 }) {
   gsap.set(info, { opacity: 0 });
   gsap.set(clientItems, { scale: 1.5, opacity: 0, transformOrigin: "50% 50%" });
   gsap.set(overlay, { autoAlpha: 0 });
   gsap.set(previewImageContainer, { autoAlpha: 0, scale: 0.4 });
   gsap.set(namePreview, { autoAlpha: 0, scale: 0.96 });
+  gsap.set(overlayCursorClose, { autoAlpha: 0 });
 }
 
 function revealHeadingLines(lines: HTMLElement[], isIntroPlayed: boolean) {
@@ -100,6 +103,7 @@ export function useAbout() {
   const nameRef = useRef<HTMLSpanElement>(null);
   const namePreviewRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
+  const overlayCursorCloseRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const previewImageContainerRef = useRef<HTMLDivElement>(null);
   const headingAnimationRef = useRef<gsap.core.Tween | null>(null);
@@ -115,6 +119,7 @@ export function useAbout() {
     if (!isPreviewOpenRef.current) return;
     isPreviewOpenRef.current = false;
     gsap.set(namePreviewRef.current, { autoAlpha: 0, scale: 0.98 });
+    gsap.set(overlayCursorCloseRef.current, { autoAlpha: 0 });
 
     gsap.to(previewImageContainerRef.current, {
       scale: 0.4,
@@ -160,15 +165,23 @@ export function useAbout() {
       const namePreview = namePreviewRef.current;
       const overlay = overlayRef.current;
       const previewImageContainer = previewImageContainerRef.current;
+      const overlayCursorClose = overlayCursorCloseRef.current;
 
-      if (!heading || !info || !namePreview || !overlay || !previewImageContainer) return;
+      if (!heading || !info || !namePreview || !overlay || !previewImageContainer || !overlayCursorClose) return;
 
       const clientItems = gsap.utils.toArray<HTMLElement>("[data-client-item]");
       const split = createHeadingSplit(heading, headingAnimationRef, refreshNamePulseTarget);
       const rows = getClientRows(clientItems);
       const splitLines = split.lines as HTMLElement[];
 
-      setInitialVisualStates({ info, clientItems, overlay, previewImageContainer, namePreview });
+      setInitialVisualStates({
+        info,
+        clientItems,
+        overlay,
+        previewImageContainer,
+        namePreview,
+        overlayCursorClose,
+      });
       gsap.set(containerRef.current, { autoAlpha: 1 });
       revealHeadingLines(splitLines, introPlayedRef.current);
       
@@ -205,14 +218,24 @@ export function useAbout() {
       const heading = headingRef.current;
       const namePreview = namePreviewRef.current;
       const overlay = overlayRef.current;
+      const overlayCursorClose = overlayCursorCloseRef.current;
       const previewImageContainer = previewImageContainerRef.current;
-      if (!heading || !namePreview || !overlay || !previewImageContainer) return;
+      if (!heading || !namePreview || !overlay || !overlayCursorClose || !previewImageContainer) return;
 
       const hoverMediaQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
       let isHoverDevice = hoverMediaQuery.matches;
       const movePreviewX = gsap.quickTo(namePreview, "x", { duration: 0.4, ease: "power3.out" });
       const movePreviewY = gsap.quickTo(namePreview, "y", { duration: 0.4, ease: "power3.out" });
+      const moveOverlayCursorCloseX = gsap.quickTo(overlayCursorClose, "x", {
+        duration: 0.3,
+        ease: "power3.out",
+      });
+      const moveOverlayCursorCloseY = gsap.quickTo(overlayCursorClose, "y", {
+        duration: 0.3,
+        ease: "power3.out",
+      });
       let isNameHovered = false;
+      let isOverlayHovered = false;
 
       const getNameTarget = (target: EventTarget | null) => {
         if (!(target instanceof Element)) return null;
@@ -237,8 +260,22 @@ export function useAbout() {
         isHoverDevice = event.matches;
         if (!isHoverDevice) {
           isNameHovered = false;
+          isOverlayHovered = false;
           gsap.set(namePreview, { autoAlpha: 0, scale: 0.98 });
+          gsap.set(overlayCursorClose, { autoAlpha: 0 });
         }
+      };
+
+      const showOverlayCursorClose = () => {
+        if (!isPreviewOpenRef.current || isOverlayHovered || !isHoverDevice) return;
+        isOverlayHovered = true;
+        gsap.to(overlayCursorClose, { autoAlpha: 1, duration: 0.2, ease: "power2.out" });
+      };
+
+      const hideOverlayCursorClose = () => {
+        if (!isOverlayHovered) return;
+        isOverlayHovered = false;
+        gsap.to(overlayCursorClose, { autoAlpha: 0, duration: 0.2, ease: "power2.out" });
       };
 
       const handleHeadingMouseOver = (event: MouseEvent) => {
@@ -271,11 +308,29 @@ export function useAbout() {
         isPreviewOpenRef.current = true;
 
         isNameHovered = false;
+        isOverlayHovered = false;
         gsap.set(namePreview, { autoAlpha: 0, scale: 0.98 });
+        gsap.set(overlayCursorClose, { autoAlpha: 0 });
 
         namePulseLoopRef.current?.pause();
         animatePreviewOpen({ overlay, previewImageContainer });
         closeButtonRef.current?.focus();
+      };
+
+      const handleOverlayMouseEnter = () => {
+        if (!isHoverDevice || !isPreviewOpenRef.current) return;
+        showOverlayCursorClose();
+      };
+
+      const handleOverlayMouseMove = (event: MouseEvent) => {
+        if (!isHoverDevice || !isPreviewOpenRef.current) return;
+        showOverlayCursorClose();
+        moveOverlayCursorCloseX(event.clientX - 18);
+        moveOverlayCursorCloseY(event.clientY + 25);
+      };
+
+      const handleOverlayMouseLeave = () => {
+        hideOverlayCursorClose();
       };
 
       const handleKeyDown = (event: KeyboardEvent) => {
@@ -313,6 +368,9 @@ export function useAbout() {
       heading.addEventListener("mousemove", handleHeadingMouseMove);
       heading.addEventListener("mouseout", handleHeadingMouseOut);
       heading.addEventListener("click", handleHeadingClick);
+      overlay.addEventListener("mouseenter", handleOverlayMouseEnter);
+      overlay.addEventListener("mousemove", handleOverlayMouseMove);
+      overlay.addEventListener("mouseleave", handleOverlayMouseLeave);
       window.addEventListener("keydown", handleKeyDown);
 
       return () => {
@@ -321,6 +379,9 @@ export function useAbout() {
         heading.removeEventListener("mousemove", handleHeadingMouseMove);
         heading.removeEventListener("mouseout", handleHeadingMouseOut);
         heading.removeEventListener("click", handleHeadingClick);
+        overlay.removeEventListener("mouseenter", handleOverlayMouseEnter);
+        overlay.removeEventListener("mousemove", handleOverlayMouseMove);
+        overlay.removeEventListener("mouseleave", handleOverlayMouseLeave);
         window.removeEventListener("keydown", handleKeyDown);
       };
     },
@@ -334,6 +395,7 @@ export function useAbout() {
     nameRef,
     namePreviewRef,
     overlayRef,
+    overlayCursorCloseRef,
     closeButtonRef,
     previewImageContainerRef,
     isImageLoaded,
