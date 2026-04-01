@@ -26,7 +26,7 @@ export default function VideoStackLayout({ videos }: VideoStackLayoutProps) {
       aria-label="Video gallery"
     >
       <div className="mx-auto w-full max-w-6xl">
-        <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-14 lg:gap-16">
+        <div className="mx-auto flex w-full xl:max-w-3xl flex-col items-center gap-12 lg:gap-16">
           {videoItems.map((video) => (
             <article
               key={video.id}
@@ -45,7 +45,7 @@ export default function VideoStackLayout({ videos }: VideoStackLayoutProps) {
                   allowFullScreen
                 />
               </div>
-              <p className="mt-2 text-center text-sm uppercase tracking-[0.2em] text-foreground/85 md:hidden">
+              <p className="mt-4 text-center text-sm uppercase tracking-[0.2em] text-foreground/85 xl:hidden">
                 {video.client}
               </p>
             </article>
@@ -53,7 +53,7 @@ export default function VideoStackLayout({ videos }: VideoStackLayoutProps) {
         </div>
 
         {/* Fixed Title Container - Left side (Desktop only) */}
-        <div className="fixed left-6 top-1/2 z-40 hidden h-6 w-48 -translate-y-1/2 overflow-hidden text-foreground/85 md:block lg:left-16">
+        <div className="fixed left-6 top-1/2 z-40 hidden h-6 w-60 -translate-y-1/2 overflow-hidden text-foreground/85 xl:block lg:left-16">
           <div className="relative h-full w-full">
             {videoItems.map((video) => {
               const isActive = activeVideoId === video.id;
@@ -74,7 +74,7 @@ export default function VideoStackLayout({ videos }: VideoStackLayoutProps) {
         </div>
 
         <aside
-          className="fixed right-12 top-1/2 z-40 hidden -translate-y-1/2 lg:block"
+          className="fixed right-16 top-1/2 z-40 hidden -translate-y-1/2 xl:block"
           aria-label="Video mini map"
         >
           <ul className="flex flex-col gap-3">
@@ -84,7 +84,7 @@ export default function VideoStackLayout({ videos }: VideoStackLayoutProps) {
                   ref={(node) => setMiniMapItemRef(video.id, node)}
                   type="button"
                   onClick={() => scrollToVideo(video.id)}
-                  className="overflow-hidden rounded-sm border border-border/70 bg-background transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                  className={cn("overflow-hidden bg-background transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2")}
                   aria-label={`Go to ${video.client} video`}
                   aria-current={activeVideoId === video.id ? "true" : undefined}
                 >
@@ -102,6 +102,7 @@ export default function VideoStackLayout({ videos }: VideoStackLayoutProps) {
           </ul>
         </aside>
       </div>
+      {/* <div className="hidden lg:block xl:hidden h-60"></div> */}
     </section>
   );
 }

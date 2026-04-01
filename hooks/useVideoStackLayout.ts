@@ -35,7 +35,7 @@ export function useVideoStackLayout(videos: VideoDataItem[]) {
             ...video,
             youtubeId,
             embedUrl: `https://www.youtube.com/embed/${youtubeId}`,
-            thumbnailUrl: `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`,
+            thumbnailUrl: video.thumbnail,
           };
         })
         .filter((item): item is VideoItem => item !== null),
@@ -99,7 +99,7 @@ export function useVideoStackLayout(videos: VideoDataItem[]) {
         const isActive = activeVideoId === video.id;
         gsap.to(thumbnail, {
           filter: isActive ? "grayscale(0)" : "grayscale(1)",
-          scale: isActive ? 1.06 : 1,
+          scale: isActive ? 1.25 : 1,
           duration: 0.25,
           ease: "power2.out",
           overwrite: "auto",

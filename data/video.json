@@ -1,37 +1,44 @@
 [
   {
     "id": "video-215683596",
-    "client": "BLACKPINK",
-    "videoUrl": "https://youtube.com/watch?v=35XABEDIR7k"
+    "client": "BLACKPINK [ENCORE]",
+    "videoUrl": "https://youtube.com/watch?v=35XABEDIR7k",
+    "thumbnail": "/thumbnails/blackpink [encore].jpg"
   },
   {
     "id": "video-215681565",
-    "client": "ENHYPEN",
-    "videoUrl": "https://youtube.com/watch?v=97EWF_XDuTs"
+    "client": "ENHYPEN [FATE]",
+    "videoUrl": "https://youtube.com/watch?v=97EWF_XDuTs",
+    "thumbnail": "/thumbnails/enhyphen [fate].jpg"
   },
   {
     "id": "video-285568014",
-    "client": "ATEEZ",
-    "videoUrl": "https://youtube.com/watch?v=oZHxE2GPpGE"
+    "client": "ATEEZ [BOUNCY]",
+    "videoUrl": "https://youtube.com/watch?v=oZHxE2GPpGE",
+    "thumbnail": "/thumbnails/ateez [bouncy].jpg"
   },
   {
     "id": "video-285568015",
-    "client": "ATEEZ",
-    "videoUrl": "https://youtube.com/watch?v=JlxgA6usGvY"
+    "client": "ATEEZ [HALAZIA]",
+    "videoUrl": "https://youtube.com/watch?v=JlxgA6usGvY",
+    "thumbnail": "/thumbnails/ateez [halazia].jpg"
   },
   {
     "id": "video-285568016",
-    "client": "ATEEZ",
-    "videoUrl": "https://youtube.com/watch?v=jriUlWlCdp0"
+    "client": "ATEEZ [ARRIBA]",
+    "videoUrl": "https://youtube.com/watch?v=jriUlWlCdp0",
+    "thumbnail": "/thumbnails/ateez [arriba].jpg"
   },
   {
     "id": "video-285566718",
-    "client": "ENHYPEN",
-    "videoUrl": "https://youtube.com/watch?v=4a-W2cypGAo"
+    "client": "ENHYPEN [LOOSE]",
+    "videoUrl": "https://youtube.com/watch?v=4a-W2cypGAo",
+    "thumbnail": "/thumbnails/enhyphen [loose].jpg"
   },
   {
     "id": "video-215681227",
-    "client": "(G)I-DLE",
-    "videoUrl": "https://youtube.com/watch?v=6g_qFnZjsxQ"
+    "client": "(G)I-DLE [I AM FREE-TY]",
+    "videoUrl": "https://youtube.com/watch?v=6g_qFnZjsxQ",
+    "thumbnail": "/thumbnails/(G)i-dle [i am free-ty].jpg"
   }
 ]
