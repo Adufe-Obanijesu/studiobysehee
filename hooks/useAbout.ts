@@ -278,6 +278,11 @@ export function useAbout() {
         gsap.to(overlayCursorClose, { autoAlpha: 0, duration: 0.2, ease: "power2.out" });
       };
 
+      const isPointerOverPreviewImage = (target: EventTarget | null) => {
+        if (!(target instanceof Element)) return false;
+        return Boolean(target.closest("[data-about-preview-image]"));
+      };
+
       const handleHeadingMouseOver = (event: MouseEvent) => {
         if (!isHoverDevice || !getNameTarget(event.target)) return;
         showNamePreview();
@@ -317,13 +322,18 @@ export function useAbout() {
         closeButtonRef.current?.focus();
       };
 
-      const handleOverlayMouseEnter = () => {
+      const handleOverlayMouseEnter = (event: MouseEvent) => {
         if (!isHoverDevice || !isPreviewOpenRef.current) return;
+        if (isPointerOverPreviewImage(event.target)) return;
         showOverlayCursorClose();
       };
 
       const handleOverlayMouseMove = (event: MouseEvent) => {
         if (!isHoverDevice || !isPreviewOpenRef.current) return;
+        if (isPointerOverPreviewImage(event.target)) {
+          hideOverlayCursorClose();
+          return;
+        }
         showOverlayCursorClose();
         moveOverlayCursorCloseX(event.clientX - 18);
         moveOverlayCursorCloseY(event.clientY + 25);

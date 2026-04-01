@@ -201,6 +201,7 @@ export default function About() {
 
         {/* Backdrop */}
         <div
+          data-about-overlay-backdrop
           className="absolute inset-0 bg-background/85 backdrop-blur-md cursor-pointer"
           onClick={closePreview}
           aria-hidden="true"
@@ -220,6 +221,7 @@ export default function About() {
         {/* Image container — transformOrigin set by GSAP at click time */}
         <div
           ref={previewImageContainerRef}
+          data-about-preview-image
           className="relative z-10 overflow-hidden rounded-xl"
           style={{
             width: "min(85vw, 900px)",
