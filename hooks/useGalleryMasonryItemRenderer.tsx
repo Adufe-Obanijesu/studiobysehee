@@ -24,7 +24,7 @@ export function useGalleryMasonryItemRenderer({
     ({ data: image }: RenderComponentProps<GalleryImage>) => (
       <figure
         ref={registerFigureRef(image.id)}
-        className="relative overflow-hidden rounded-xl bg-muted/20"
+        className="group relative overflow-hidden rounded-xl bg-muted/20"
       >
         <Skeleton className="pointer-events-none absolute inset-0 z-0 rounded-none" />
         <Image
@@ -33,7 +33,7 @@ export function useGalleryMasonryItemRenderer({
           width={image.width}
           height={image.height}
           sizes={GALLERY_GRID_IMAGE_SIZES}
-          className={`relative z-10 h-auto w-full object-cover transition-opacity duration-300 ${
+          className={`relative z-10 h-auto w-full object-cover group-hover:scale-105 transition duration-300 ${
             isImageLoaded(image.id) ? "opacity-100" : "opacity-0"
           }`}
           loading="lazy"
