@@ -3,9 +3,11 @@ import { Cormorant_Garamond, DM_Sans, Geist } from "next/font/google";
 import { cookies } from "next/headers";
 import "./globals.css";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { BookingProvider } from "@/context/BookingContext";
 import { cn } from "@/lib/utils";
 import Preloader from "@/components/Preloader";
 import QueryProvider from "@/components/QueryProvider";
+import { BookingModal } from "@/components/BookingModal";
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -46,15 +48,18 @@ export default async function RootLayout({
       <body
         className={`relative ${cormorant.variable} ${dmSans.variable} font-dm antialiased`}
       >
-        <ThemeProvider initialIsDark={initialIsDark}>
-          <QueryProvider>
-            <Preloader />
-            <div id="page-content" className="invisible">
-              {children}
-            </div>
-            {/* <CustomCursor /> */}
-          </QueryProvider>
-        </ThemeProvider>
+        <BookingProvider>
+          <ThemeProvider initialIsDark={initialIsDark}>
+            <QueryProvider>
+              <Preloader />
+              <div id="page-content" className="invisible">
+                {children}
+              </div>
+              {/* <CustomCursor /> */}
+            </QueryProvider>
+          </ThemeProvider>
+          <BookingModal />
+        </BookingProvider>
       </body>
     </html>
   );

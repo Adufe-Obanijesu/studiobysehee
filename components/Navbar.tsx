@@ -14,6 +14,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useBooking } from "@/context/BookingContext";
 
 function AnimatedNavLink({ link }: { link: NavLink }) {
   const { wrapperRef, line1Ref, line2Ref, onMouseEnter, onMouseLeave } =
@@ -49,11 +50,20 @@ function AnimatedNavLink({ link }: { link: NavLink }) {
   );
 }
 
-export function BookSessionButton() {
+export function BookSessionButton({
+  onAfterOpen,
+}: {
+  onAfterOpen?: () => void;
+}) {
+  const { open } = useBooking();
 
   return (
-    <Link
-      href="/book"
+    <button
+      type="button"
+      onClick={() => {
+        open();
+        onAfterOpen?.();
+      }}
       className="block group relative ml-1 overflow-hidden rounded-md bg-primary lg:px-4 lg:py-2 px-8 py-4 lg:text-sm font-medium text-background text-center lg:text-left"
     >
       <span
@@ -67,7 +77,7 @@ export function BookSessionButton() {
       <span className="relative z-10 text-light transition-colors transition-ease-300 group-hover:text-background lg:inline-block hidden xl:hidden">
         Book
       </span>
-    </Link>
+    </button>
   );
 }
 
@@ -275,7 +285,7 @@ export default function Navbar() {
           </div>
 
           <div ref={mobileCtaRef} className="shrink-0">
-            <BookSessionButton />
+            <BookSessionButton onAfterOpen={closeMobileMenu} />
           </div>
         </div>
       </div>
