@@ -97,7 +97,8 @@ export function useNavbar() {
           {
             scale: 1,
             duration: 0.4,
-            ease: EASE,
+            // ease: EASE,
+            ease: "back.out(1.7)",
             stagger: 0.05,
           },
           "-=0.15"

@@ -91,7 +91,7 @@ export default function About() {
     <>
       <section
         ref={containerRef}
-        className="min-h-[calc(100svh-3.5rem)] flex flex-col max-w-7xl mx-auto px-8 md:px-12 lg:px-16 pb-10 lg:pb-14"
+        className="min-h-[calc(100svh-3.5rem)] flex flex-col max-w-7xl mx-auto px-8 md:px-12 lg:px-16 pb-10 lg:pb-14 invisible"
       >
         {/* Heading */}
         <div className="flex-1 flex items-center justify-center py-16 md:py-20">
