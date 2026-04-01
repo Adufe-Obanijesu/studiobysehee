@@ -4,13 +4,6 @@ import { useBookingModal } from "@/hooks/useBookingModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { HiOutlineX } from "react-icons/hi";
@@ -34,14 +27,12 @@ export function BookingModal() {
     message,
     setMessage,
     handleSubmit,
-    shootLocationOptions,
-    discoveryOptions,
   } = useBookingModal();
 
   return (
     <div
       ref={scopeRef}
-      className="fixed inset-0 z-10000"
+      className="fixed inset-0 z-10000 invisible"
       role="dialog"
       aria-modal="true"
       aria-labelledby="booking-modal-title"
@@ -129,45 +120,26 @@ export function BookingModal() {
 
             <div className="booking-form-field space-y-2">
               <Label htmlFor="booking-location">Where would you like to shoot?</Label>
-              <Select value={location || undefined} onValueChange={setLocation}>
-                <SelectTrigger
-                  id="booking-location"
-                  className="w-full min-w-0"
-                  aria-required
-                >
-                  <SelectValue placeholder="Select a location" />
-                </SelectTrigger>
-                <SelectContent className="z-10050">
-                  {shootLocationOptions.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Input
+                id="booking-location"
+                name="location"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="e.g. studio, city, or outdoor"
+                required
+              />
             </div>
 
             <div className="booking-form-field space-y-2">
               <Label htmlFor="booking-discovery">How did you hear about me?</Label>
-              <Select
-                value={discovery || undefined}
-                onValueChange={setDiscovery}
-              >
-                <SelectTrigger
-                  id="booking-discovery"
-                  className="w-full min-w-0"
-                  aria-required
-                >
-                  <SelectValue placeholder="Select one" />
-                </SelectTrigger>
-                <SelectContent className="z-10050">
-                  {discoveryOptions.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Input
+                id="booking-discovery"
+                name="discovery"
+                value={discovery}
+                onChange={(e) => setDiscovery(e.target.value)}
+                placeholder="e.g. Instagram, friend referral"
+                required
+              />
             </div>
 
             <div className="booking-form-field space-y-2">

@@ -1,10 +1,6 @@
 "use client";
 
 import { useBooking } from "@/context/BookingContext";
-import {
-  DISCOVERY_SOURCE_OPTIONS,
-  SHOOT_LOCATION_OPTIONS,
-} from "@/data/booking";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import {
@@ -228,7 +224,5 @@ export function useBookingModal() {
     message,
     setMessage,
     handleSubmit,
-    shootLocationOptions: SHOOT_LOCATION_OPTIONS,
-    discoveryOptions: DISCOVERY_SOURCE_OPTIONS,
   };
 }
