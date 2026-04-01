@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useVideoStackLayout } from "@/hooks/useVideoStackLayout";
 import type { VideoDataItem } from "./types";
+import { cn } from "@/lib/utils";
 
 type VideoStackLayoutProps = {
   videos: VideoDataItem[];
@@ -44,15 +45,36 @@ export default function VideoStackLayout({ videos }: VideoStackLayoutProps) {
                   allowFullScreen
                 />
               </div>
-              <p className="mt-2 text-center text-sm uppercase tracking-[0.2em] text-foreground/85">
+              <p className="mt-2 text-center text-sm uppercase tracking-[0.2em] text-foreground/85 md:hidden">
                 {video.client}
               </p>
             </article>
           ))}
         </div>
 
+        {/* Fixed Title Container - Left side (Desktop only) */}
+        <div className="fixed left-6 top-1/2 z-40 hidden h-6 w-48 -translate-y-1/2 overflow-hidden text-foreground/85 md:block lg:left-16">
+          <div className="relative h-full w-full">
+            {videoItems.map((video) => {
+              const isActive = activeVideoId === video.id;
+              return (
+                <div
+                  key={`title-${video.id}`}
+                  className={cn(
+                    "absolute left-0 top-0 flex h-full w-full items-center text-sm uppercase tracking-[0.2em] transition-transform duration-500 will-change-transform",
+                    isActive ? "translate-y-0" : "translate-y-full"
+                  )}
+                  aria-hidden={!isActive}
+                >
+                  {video.client}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         <aside
-          className="fixed right-6 top-1/2 z-40 hidden -translate-y-1/2 lg:block"
+          className="fixed right-12 top-1/2 z-40 hidden -translate-y-1/2 lg:block"
           aria-label="Video mini map"
         >
           <ul className="flex flex-col gap-3">
