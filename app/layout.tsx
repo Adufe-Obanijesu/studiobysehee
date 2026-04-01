@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import Preloader from "@/components/Preloader";
 import QueryProvider from "@/components/QueryProvider";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 
 
 // import CustomCursor from "@/components/CustomCursor";
@@ -48,8 +48,8 @@ export default async function RootLayout({
       >
         <ThemeProvider initialIsDark={initialIsDark}>
           <QueryProvider>
-            {/* <Preloader /> */}
-            <div id="page-content" className="invisibl mt-14">
+            <Preloader />
+            <div id="page-content" className="invisible">
               {children}
             </div>
             {/* <CustomCursor /> */}
