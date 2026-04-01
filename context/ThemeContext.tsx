@@ -111,7 +111,9 @@ export function ThemeProvider({
         />
         <div className="relative z-10">
           <Navbar />
-          {children}
+          <div className="mt-16">
+            {children}
+          </div>
           <Footer />
         </div>
       </main>
