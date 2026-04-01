@@ -116,8 +116,11 @@ export function useAbout() {
 
   const [isImageLoaded, setIsImageLoaded] = useState(false);
 
-  const preloaderGate = usePreloaderContext();
-  const preloaderComplete = preloaderGate?.preloaderComplete ?? true;
+  const uiGate = usePreloaderContext();
+  const preloaderComplete = uiGate?.preloaderComplete ?? true;
+  const mobileNavAllowsPageAnimations =
+    uiGate?.mobileNavAllowsPageAnimations ?? true;
+  const canRunPageIntro = preloaderComplete && mobileNavAllowsPageAnimations;
 
   const closePreview = useCallback(() => {
     if (!isPreviewOpenRef.current) return;
@@ -164,7 +167,7 @@ export function useAbout() {
 
   useGSAP(
     () => {
-      if (!preloaderComplete) return;
+      if (!canRunPageIntro) return;
 
       const heading = headingRef.current;
       const info = infoRef.current;
@@ -216,7 +219,10 @@ export function useAbout() {
         namePulseLoopRef.current = null;
       };
     },
-    { scope: containerRef, dependencies: [refreshNamePulseTarget, preloaderComplete] }
+    {
+      scope: containerRef,
+      dependencies: [refreshNamePulseTarget, canRunPageIntro],
+    }
   );
 
   useGSAP(

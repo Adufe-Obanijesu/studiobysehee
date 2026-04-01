@@ -50,8 +50,8 @@ export default async function RootLayout({
         className={`relative ${cormorant.variable} ${dmSans.variable} font-dm antialiased`}
       >
         <BookingProvider>
-          <ThemeProvider initialIsDark={initialIsDark}>
-            <PreloaderProvider>
+          <PreloaderProvider>
+            <ThemeProvider initialIsDark={initialIsDark}>
               <QueryProvider>
                 <Preloader />
                 <div id="page-content" className="invisible">
@@ -59,8 +59,8 @@ export default async function RootLayout({
                 </div>
                 {/* <CustomCursor /> */}
               </QueryProvider>
-            </PreloaderProvider>
-          </ThemeProvider>
+            </ThemeProvider>
+          </PreloaderProvider>
           <BookingModal />
         </BookingProvider>
       </body>

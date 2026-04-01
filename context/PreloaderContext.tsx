@@ -9,9 +9,14 @@ import {
   type ReactNode,
 } from "react";
 
+/** App UI gates: initial load preloader and mobile overlay transitions. */
 type PreloaderContextValue = {
   preloaderComplete: boolean;
   markPreloaderFinished: () => void;
+  /** False while the mobile menu close animation is running (after it was open). */
+  mobileNavAllowsPageAnimations: boolean;
+  markMobileNavCloseStarted: () => void;
+  markMobileNavCloseFinished: () => void;
 };
 
 const PreloaderContext = createContext<PreloaderContextValue | null>(null);
@@ -23,14 +28,36 @@ export function usePreloaderContext(): PreloaderContextValue | null {
 
 export function PreloaderProvider({ children }: { children: ReactNode }) {
   const [preloaderComplete, setPreloaderComplete] = useState(false);
+  const [mobileNavAllowsPageAnimations, setMobileNavAllowsPageAnimations] =
+    useState(true);
 
   const markPreloaderFinished = useCallback(() => {
     setPreloaderComplete(true);
   }, []);
 
+  const markMobileNavCloseStarted = useCallback(() => {
+    setMobileNavAllowsPageAnimations(false);
+  }, []);
+
+  const markMobileNavCloseFinished = useCallback(() => {
+    setMobileNavAllowsPageAnimations(true);
+  }, []);
+
   const value = useMemo(
-    () => ({ preloaderComplete, markPreloaderFinished }),
-    [preloaderComplete, markPreloaderFinished]
+    () => ({
+      preloaderComplete,
+      markPreloaderFinished,
+      mobileNavAllowsPageAnimations,
+      markMobileNavCloseStarted,
+      markMobileNavCloseFinished,
+    }),
+    [
+      preloaderComplete,
+      markPreloaderFinished,
+      mobileNavAllowsPageAnimations,
+      markMobileNavCloseStarted,
+      markMobileNavCloseFinished,
+    ]
   );
 
   return (

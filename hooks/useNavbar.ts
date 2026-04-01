@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { usePreloaderContext } from "@/context/PreloaderContext";
 import { NAV_LINKS, SOCIAL_LINKS } from "@/data/navbar";
 
 const DURATION = 0.5;
@@ -12,6 +13,14 @@ const ICON_DURATION = 0.3;
 
 export function useNavbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const uiGate = usePreloaderContext();
+  const markMobileNavCloseStartedRef = useRef(uiGate?.markMobileNavCloseStarted);
+  const markMobileNavCloseFinishedRef = useRef(uiGate?.markMobileNavCloseFinished);
+  markMobileNavCloseStartedRef.current = uiGate?.markMobileNavCloseStarted;
+  markMobileNavCloseFinishedRef.current = uiGate?.markMobileNavCloseFinished;
+
+  const prevMobileMenuOpenRef = useRef(false);
+
   const overlayScopeRef = useRef<HTMLDivElement | null>(null);
   const circleRef = useRef<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -138,6 +147,7 @@ export function useNavbar() {
       if (isMobileMenuOpen) {
         closeTimelineRef.current?.kill();
         closeTimelineRef.current = null;
+        markMobileNavCloseFinishedRef.current?.();
 
         // Ensure content and items are visible before playing open timeline
         gsap.set([content, ".mobile-nav-link"], { opacity: 1 });
@@ -146,7 +156,15 @@ export function useNavbar() {
           pointerEvents: "auto",
         });
         tl.restart();
+        prevMobileMenuOpenRef.current = true;
       } else {
+        const closingFromOpen = prevMobileMenuOpenRef.current;
+        prevMobileMenuOpenRef.current = false;
+
+        if (closingFromOpen) {
+          markMobileNavCloseStartedRef.current?.();
+        }
+
         // Close: fade out all inner elements, then shrink the circle
         const mobileLinks = gsap.utils.toArray<HTMLElement>(".mobile-nav-link");
 
@@ -178,6 +196,9 @@ export function useNavbar() {
           .timeline({
             defaults: { ease: EASE },
             onComplete: () => {
+              if (closingFromOpen) {
+                markMobileNavCloseFinishedRef.current?.();
+              }
               gsap.set(overlayScopeRef.current, {
                 pointerEvents: "none",
               });
