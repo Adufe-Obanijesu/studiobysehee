@@ -55,18 +55,6 @@ export function BookingModal() {
         className="absolute inset-0 flex flex-col overflow-y-auto overscroll-contain"
       >
         <div className="pointer-events-auto relative mx-auto flex w-full max-w-lg flex-1 flex-col gap-8 px-6 pb-16 pt-20 md:px-8 md:pt-24">
-          <button
-            type="button"
-            onClick={close}
-            className={cn(
-              "absolute right-4 top-4 z-10 inline-flex size-10 items-center justify-center rounded-full",
-              "text-foreground transition transition-ease-200 hover:bg-muted"
-            )}
-            aria-label="Close booking form"
-          >
-            <HiOutlineX className="size-6" aria-hidden />
-          </button>
-
           <div className="booking-form-field space-y-2">
             <h2
               id="booking-modal-title"
@@ -163,6 +151,18 @@ export function BookingModal() {
           </form>
         </div>
       </div>
+
+      <button
+        type="button"
+        onClick={close}
+        className={cn(
+          "pointer-events-auto fixed right-4 top-4 z-10001 inline-flex size-10 items-center justify-center rounded-full",
+          "text-foreground transition transition-ease-200 hover:bg-muted"
+        )}
+        aria-label="Close booking form"
+      >
+        <HiOutlineX className="size-6" aria-hidden />
+      </button>
     </div>
   );
 }
