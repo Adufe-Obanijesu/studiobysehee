@@ -2,6 +2,7 @@ import { useRef, useState, useCallback } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { SplitText } from "gsap/SplitText";
+import { usePreloaderContext } from "@/context/PreloaderContext";
 
 gsap.registerPlugin(useGSAP, SplitText);
 
@@ -115,6 +116,9 @@ export function useAbout() {
 
   const [isImageLoaded, setIsImageLoaded] = useState(false);
 
+  const preloaderGate = usePreloaderContext();
+  const preloaderComplete = preloaderGate?.preloaderComplete ?? true;
+
   const closePreview = useCallback(() => {
     if (!isPreviewOpenRef.current) return;
     isPreviewOpenRef.current = false;
@@ -160,6 +164,8 @@ export function useAbout() {
 
   useGSAP(
     () => {
+      if (!preloaderComplete) return;
+
       const heading = headingRef.current;
       const info = infoRef.current;
       const namePreview = namePreviewRef.current;
@@ -210,7 +216,7 @@ export function useAbout() {
         namePulseLoopRef.current = null;
       };
     },
-    { scope: containerRef, dependencies: [refreshNamePulseTarget] }
+    { scope: containerRef, dependencies: [refreshNamePulseTarget, preloaderComplete] }
   );
 
   useGSAP(

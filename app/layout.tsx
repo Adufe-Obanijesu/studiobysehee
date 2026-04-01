@@ -3,6 +3,7 @@ import { Cormorant_Garamond, DM_Sans, Geist } from "next/font/google";
 import { cookies } from "next/headers";
 import "./globals.css";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { PreloaderProvider } from "@/context/PreloaderContext";
 import { BookingProvider } from "@/context/BookingContext";
 import { cn } from "@/lib/utils";
 import Preloader from "@/components/Preloader";
@@ -50,13 +51,15 @@ export default async function RootLayout({
       >
         <BookingProvider>
           <ThemeProvider initialIsDark={initialIsDark}>
-            <QueryProvider>
-              <Preloader />
-              <div id="page-content" className="invisible">
-                {children}
-              </div>
-              {/* <CustomCursor /> */}
-            </QueryProvider>
+            <PreloaderProvider>
+              <QueryProvider>
+                <Preloader />
+                <div id="page-content" className="invisible">
+                  {children}
+                </div>
+                {/* <CustomCursor /> */}
+              </QueryProvider>
+            </PreloaderProvider>
           </ThemeProvider>
           <BookingModal />
         </BookingProvider>

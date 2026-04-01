@@ -3,6 +3,7 @@
 // TODO: Ensure assets are loaded before the preloader starts
 
 import "@/lib/gsap-effects";
+import { usePreloaderContext } from "@/context/PreloaderContext";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -108,6 +109,9 @@ export function usePreloader() {
   const line2Ref = useRef<HTMLHeadingElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const [allLoaded, setAllLoaded] = useState(false);
+  const preloaderCtx = usePreloaderContext();
+  const markPreloaderFinishedRef = useRef(preloaderCtx?.markPreloaderFinished);
+  markPreloaderFinishedRef.current = preloaderCtx?.markPreloaderFinished;
 
   useEffect(() => {
     setAllLoaded(true);
@@ -147,11 +151,20 @@ export function usePreloader() {
         tl.add(createCircleSegment(circleRef.current));
       }
       tl
-      .set("#preloader", {display: "none"})
-      .to("#navbar, #page-content", {autoAlpha: 1, duration: .5, stagger: 0.25}, "<+75%")
-      .set(circleRef.current, {willChange: "auto"})
+      .set("#preloader", { display: "none" })
+      .to(
+        "#navbar, #page-content",
+        { autoAlpha: 1, duration: 0.5, stagger: 0.25 },
+        "<+75%"
+      )
+      .set(circleRef.current, { willChange: "auto" });
+
+      tl.eventCallback("onComplete", () => {
+        markPreloaderFinishedRef.current?.();
+      });
 
       return () => {
+        tl.eventCallback("onComplete", null);
         split1.revert();
         split2.revert();
       };
