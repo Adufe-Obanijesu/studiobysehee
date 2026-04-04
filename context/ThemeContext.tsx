@@ -10,7 +10,6 @@ import {
   type ReactNode,
   type RefObject,
 } from "react";
-import Navbar from "@/components/Navbar";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import Footer from "@/components/Footer";
@@ -122,7 +121,6 @@ export function ThemeProvider({
           aria-hidden
         />
         <div className="relative z-10">
-          <Navbar />
           <div className="mt-16">
             {children}
           </div>

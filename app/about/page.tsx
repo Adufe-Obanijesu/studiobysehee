@@ -1,5 +1,6 @@
 "use client";
 
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
 import { useAbout } from "@/hooks/useAbout";
@@ -85,7 +86,71 @@ export default function About() {
     isImageLoaded,
     handleImageLoad,
     closePreview,
+    previewPortalTarget,
   } = useAbout();
+
+  const previewOverlay =
+    previewPortalTarget != null
+      ? createPortal(
+          <div
+            ref={overlayRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Portrait of Sehee Kim"
+            className="fixed inset-0 z-10003 flex items-center justify-center invisible"
+          >
+            <div
+              ref={overlayCursorCloseRef}
+              className="pointer-events-none fixed left-0 top-0 z-20 hidden [@media(hover:hover)]:block text-xs uppercase tracking-[0.2em] text-foreground/90 opacity-0"
+              aria-hidden="true"
+            >
+              Close
+            </div>
+
+            <div
+              data-about-overlay-backdrop
+              className="absolute inset-0 bg-background/85 backdrop-blur-md cursor-pointer"
+              onClick={closePreview}
+              aria-hidden="true"
+            />
+
+            <button
+              ref={closeButtonRef}
+              type="button"
+              onClick={closePreview}
+              className="absolute right-4 top-4 z-10 rounded-md p-2 text-foreground transition-colors hover:bg-muted"
+              aria-label="Close preview"
+            >
+              <HiOutlineX className="size-6" aria-hidden />
+            </button>
+
+            <div
+              ref={previewImageContainerRef}
+              data-about-preview-image
+              className="relative z-10 overflow-hidden rounded-xl"
+              style={{
+                width: "min(85vw, 900px)",
+                aspectRatio: `${ABOUT_PORTRAIT_WIDTH} / ${ABOUT_PORTRAIT_HEIGHT}`,
+              }}
+            >
+              <Skeleton className="absolute inset-0 rounded-xl" />
+              <Image
+                fill
+                src={ABOUT_PORTRAIT_SRC}
+                alt="Portrait of Sehee Kim"
+                priority
+                sizes="min(85vw, 900px)"
+                className={cn(
+                  "relative z-10 object-cover transition-opacity duration-300",
+                  isImageLoaded ? "opacity-100" : "opacity-0"
+                )}
+                onLoad={handleImageLoad}
+              />
+            </div>
+          </div>,
+          previewPortalTarget,
+        )
+      : null;
 
   return (
     <>
@@ -183,66 +248,7 @@ export default function About() {
         </div>
       </section>
 
-      {/* ── Fullscreen portrait preview overlay ── */}
-      <div
-        ref={overlayRef}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Portrait of Sehee Kim"
-        className="fixed inset-0 z-10003 flex items-center justify-center invisible"
-      >
-        <div
-          ref={overlayCursorCloseRef}
-          className="pointer-events-none fixed left-0 top-0 z-20 hidden [@media(hover:hover)]:block text-xs uppercase tracking-[0.2em] text-foreground/90 opacity-0"
-          aria-hidden="true"
-        >
-          Close
-        </div>
-
-        {/* Backdrop */}
-        <div
-          data-about-overlay-backdrop
-          className="absolute inset-0 bg-background/85 backdrop-blur-md cursor-pointer"
-          onClick={closePreview}
-          aria-hidden="true"
-        />
-
-        {/* Close button */}
-        <button
-          ref={closeButtonRef}
-          type="button"
-          onClick={closePreview}
-          className="absolute right-4 top-4 z-10 rounded-md p-2 text-foreground transition-colors hover:bg-muted"
-          aria-label="Close preview"
-        >
-          <HiOutlineX className="size-6" aria-hidden />
-        </button>
-
-        {/* Image container — transformOrigin set by GSAP at click time */}
-        <div
-          ref={previewImageContainerRef}
-          data-about-preview-image
-          className="relative z-10 overflow-hidden rounded-xl"
-          style={{
-            width: "min(85vw, 900px)",
-            aspectRatio: `${ABOUT_PORTRAIT_WIDTH} / ${ABOUT_PORTRAIT_HEIGHT}`,
-          }}
-        >
-          <Skeleton className="absolute inset-0 rounded-xl" />
-          <Image
-            fill
-            src={ABOUT_PORTRAIT_SRC}
-            alt="Portrait of Sehee Kim"
-            priority
-            sizes="min(85vw, 900px)"
-            className={cn(
-              "relative z-10 object-cover transition-opacity duration-300",
-              isImageLoaded ? "opacity-100" : "opacity-0"
-            )}
-            onLoad={handleImageLoad}
-          />
-        </div>
-      </div>
+      {previewOverlay}
     </>
   );
 }

@@ -153,13 +153,21 @@ export function usePreloader() {
       tl
       .to("#preloader", { opacity: 0, duration: .2 }, "<+75%")
       .fromTo(
-        "#navbar, #page-content, footer",
+        "#page-content, footer",
         {
           autoAlpha: 0,
           scale: 0.95,
           transformOrigin: "top",
         },
         { autoAlpha: 1, scale: 1, duration: 0.5, ease: "sine.out" },
+        "<+55%"
+      )
+      .fromTo(
+        "#navbar",
+        {
+          autoAlpha: 0,
+        },
+        { autoAlpha: 1, duration: 0.5, ease: "sine.out" },
         "<+55%"
       )
       .set("#preloader", { display: "none" })

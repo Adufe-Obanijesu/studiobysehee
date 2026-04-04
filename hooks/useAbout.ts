@@ -3,6 +3,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { SplitText } from "gsap/SplitText";
 import { usePreloaderContext } from "@/context/PreloaderContext";
+import { useGalleryLightboxPortalTarget } from "@/hooks/useGalleryLightboxPortalTarget";
 
 gsap.registerPlugin(useGSAP, SplitText);
 
@@ -98,6 +99,7 @@ function animatePreviewOpen({
 }
 
 export function useAbout() {
+  const previewPortalTarget = useGalleryLightboxPortalTarget();
   const containerRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const infoRef = useRef<HTMLDivElement>(null);
@@ -221,7 +223,7 @@ export function useAbout() {
     },
     {
       scope: containerRef,
-      dependencies: [refreshNamePulseTarget, canRunPageIntro],
+      dependencies: [refreshNamePulseTarget, canRunPageIntro, previewPortalTarget],
     }
   );
 
@@ -407,7 +409,7 @@ export function useAbout() {
         window.removeEventListener("keydown", handleKeyDown);
       };
     },
-    { scope: containerRef, dependencies: [closePreview] }
+    { scope: containerRef, dependencies: [closePreview, previewPortalTarget] }
   );
 
   return {
@@ -423,5 +425,6 @@ export function useAbout() {
     isImageLoaded,
     handleImageLoad,
     closePreview,
+    previewPortalTarget,
   };
 }
