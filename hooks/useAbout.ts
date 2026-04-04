@@ -113,6 +113,8 @@ export function useAbout() {
 
   const isPreviewOpenRef = useRef(false);
   const introPlayedRef = useRef(false);
+  const introTimelineRef = useRef<gsap.core.Timeline | null>(null);
+  const introPlaybackStartedRef = useRef(false);
   const namePulseLoopRef = useRef<gsap.core.Timeline | null>(null);
   const lastFocusedElementRef = useRef<HTMLElement | null>(null);
 
@@ -122,7 +124,6 @@ export function useAbout() {
   const preloaderComplete = uiGate?.preloaderComplete ?? true;
   const mobileNavAllowsPageAnimations =
     uiGate?.mobileNavAllowsPageAnimations ?? true;
-  const canRunPageIntro = preloaderComplete && mobileNavAllowsPageAnimations;
 
   const closePreview = useCallback(() => {
     if (!isPreviewOpenRef.current) return;
@@ -169,7 +170,7 @@ export function useAbout() {
 
   useGSAP(
     () => {
-      if (!canRunPageIntro) return;
+      if (!preloaderComplete) return;
 
       const heading = headingRef.current;
       const info = infoRef.current;
@@ -195,8 +196,11 @@ export function useAbout() {
       });
       gsap.set(containerRef.current, { autoAlpha: 1 });
       revealHeadingLines(splitLines, introPlayedRef.current);
-      
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" }});
+
+      const tl = gsap.timeline({
+        paused: true,
+        defaults: { ease: "power3.out" },
+      });
       if (headingAnimationRef.current) {
         tl.add(headingAnimationRef.current);
       }
@@ -214,8 +218,13 @@ export function useAbout() {
         namePulseLoopRef.current?.play(0);
       });
 
+      introTimelineRef.current = tl;
+
       return () => {
         tl.kill();
+        introTimelineRef.current = null;
+        introPlaybackStartedRef.current = false;
+        introPlayedRef.current = false;
         split.revert();
         namePulseLoopRef.current?.kill();
         namePulseLoopRef.current = null;
@@ -223,8 +232,21 @@ export function useAbout() {
     },
     {
       scope: containerRef,
-      dependencies: [refreshNamePulseTarget, canRunPageIntro, previewPortalTarget],
+      dependencies: [refreshNamePulseTarget, preloaderComplete, previewPortalTarget],
     }
+  );
+
+  useGSAP(
+    () => {
+      if (!preloaderComplete || !mobileNavAllowsPageAnimations) return;
+
+      const tl = introTimelineRef.current;
+      if (!tl || introPlaybackStartedRef.current) return;
+
+      introPlaybackStartedRef.current = true;
+      tl.play(0);
+    },
+    { dependencies: [preloaderComplete, mobileNavAllowsPageAnimations] }
   );
 
   useGSAP(
