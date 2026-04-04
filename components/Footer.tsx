@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import { SOCIAL_LINKS } from "@/data/navbar";
-import { BookSessionButton, SocialIcon } from "./Navbar";
+import { BookSessionButton } from "@/components/BookSessionButton";
+import { SocialIcon } from "./Navbar";
 
 export default function Footer() {
   return (
-    <footer className="bg-background">
+    <footer className="bg-background invisible">
       <div className="container mx-auto px-4 py-8 flex flex-col gap-4 items-center justify-center">
       <div className="flex flex-col md:flex-row items-center md:gap-1 gap-3 shrink-0">
           <TooltipProvider>

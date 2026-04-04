@@ -69,10 +69,11 @@ export function GalleryLightbox({
         type="button"
         onClick={onClose}
         data-lightbox-control="true"
-        className="pointer-events-auto absolute right-4 top-4 z-10001 rounded-md p-2 text-foreground transition-colors hover:bg-muted"
+        className="pointer-events-auto absolute right-4 top-4 z-10001 rounded-full p-2 text-foreground group"
         aria-label="Close"
       >
-        <HiOutlineX className="size-6" aria-hidden />
+        <div className="absolute top-0 left-0 w-full h-full bg-muted group-hover:scale-100 scale-0 transition-transform transition-ease-200 rounded-full" />
+        <HiOutlineX className="size-6 relative z-10" aria-hidden />
       </button>
 
       {/* Prev arrow */}
@@ -81,13 +82,14 @@ export function GalleryLightbox({
         onClick={onNavigatePrev}
         data-lightbox-control="true"
         className={cn(
-          "pointer-events-auto absolute left-4 top-1/2 z-10001 -translate-y-1/2 rounded-md p-2 text-foreground transition-all hover:bg-muted",
+          "pointer-events-auto absolute left-4 top-1/2 z-10001 -translate-y-1/2 rounded-full p-2 text-foreground group",
           !canNavigatePrev && "pointer-events-none opacity-0",
         )}
         aria-label="Previous image"
         tabIndex={canNavigatePrev ? 0 : -1}
       >
-        <HiChevronLeft className="size-7" aria-hidden />
+        <div className="absolute top-0 left-0 w-full h-full bg-muted group-hover:scale-100 scale-0 transition-transform transition-ease-200 rounded-full" />
+        <HiChevronLeft className="size-7 relative z-10" aria-hidden />
       </button>
 
       {/* Next arrow */}
@@ -96,13 +98,14 @@ export function GalleryLightbox({
         onClick={onNavigateNext}
         data-lightbox-control="true"
         className={cn(
-          "pointer-events-auto absolute right-4 top-1/2 z-10001 -translate-y-1/2 rounded-md p-2 text-foreground transition-all hover:bg-muted",
+          "pointer-events-auto absolute right-4 top-1/2 z-10001 -translate-y-1/2 rounded-full p-2 text-foreground group",
           !canNavigateNext && "pointer-events-none opacity-0",
         )}
         aria-label="Next image"
         tabIndex={canNavigateNext ? 0 : -1}
       >
-        <HiChevronRight className="size-7" aria-hidden />
+        <div className="absolute top-0 left-0 w-full h-full bg-muted group-hover:scale-100 scale-0 transition-transform transition-ease-200 rounded-full" />
+        <HiChevronRight className="size-7 relative z-10" aria-hidden />
       </button>
 
       {/* Content wrapper: scales up from the clicked image's origin */}

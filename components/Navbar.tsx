@@ -14,7 +14,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useBooking } from "@/context/BookingContext";
+import { BookSessionButton } from "@/components/BookSessionButton";
 
 function AnimatedNavLink({ link }: { link: NavLink }) {
   const { wrapperRef, line1Ref, line2Ref, onMouseEnter, onMouseLeave } =
@@ -47,37 +47,6 @@ function AnimatedNavLink({ link }: { link: NavLink }) {
         </span>
       </span>
     </Link>
-  );
-}
-
-export function BookSessionButton({
-  onAfterOpen,
-}: {
-  onAfterOpen?: () => void;
-}) {
-  const { open } = useBooking();
-
-  return (
-    <button
-      type="button"
-      onClick={() => {
-        open();
-        onAfterOpen?.();
-      }}
-      className="block group relative ml-1 overflow-hidden rounded-md bg-primary lg:px-4 lg:py-2 px-8 py-4 lg:text-sm font-medium text-background text-center lg:text-left"
-    >
-      <span
-        className="absolute z-10 left-1/2 top-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 scale-0 rounded-full bg-foreground transition-transform transition-ease-400 group-hover:scale-100"
-        style={{ transformOrigin: "center center" }}
-        aria-hidden
-      />
-      <span className="relative z-10 text-light transition-colors transition-ease-300 group-hover:text-background lg:hidden xl:inline-block">
-        Book a session
-      </span>
-      <span className="relative z-10 text-light transition-colors transition-ease-300 group-hover:text-background lg:inline-block hidden xl:hidden">
-        Book
-      </span>
-    </button>
   );
 }
 
@@ -190,7 +159,7 @@ export default function Navbar() {
                 ))}
               </ul>
             </TooltipProvider>
-            <BookSessionButton />
+            <BookSessionButton className="ml-1" />
           </div>
 
           {/* Right: theme toggle + hamburger (mobile + tablet) */}

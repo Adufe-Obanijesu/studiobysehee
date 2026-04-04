@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { HiOutlineX } from "react-icons/hi";
+import { PrimaryCtaButton } from "./PrimaryCtaButton";
 
 export function BookingModal() {
   const {
@@ -143,7 +144,7 @@ export function BookingModal() {
             </div>
 
             <div className="booking-form-field flex flex-wrap gap-3 pt-2">
-              <Button type="submit">Send request</Button>
+              <PrimaryCtaButton type="submit">Send request</PrimaryCtaButton>
               <Button type="button" variant="outline" onClick={close}>
                 Cancel
               </Button>
@@ -154,14 +155,16 @@ export function BookingModal() {
 
       <button
         type="button"
+        id="booking-modal-close-button"
         onClick={close}
         className={cn(
-          "pointer-events-auto fixed right-4 top-4 z-10001 inline-flex size-10 items-center justify-center rounded-full",
-          "text-foreground transition transition-ease-200 hover:bg-muted"
+          "pointer-events-auto fixed right-4 top-4 z-10001 inline-flex size-10 items-center justify-center rounded-full group opacity-0",
+          "text-foreground"
         )}
         aria-label="Close booking form"
       >
-        <HiOutlineX className="size-6" aria-hidden />
+        <div className="absolute top-0 left-0 w-full h-full bg-muted group-hover:scale-100 scale-0 transition-transform transition-ease-200 rounded-full" />
+        <HiOutlineX className="size-6 relative z-10" aria-hidden />
       </button>
     </div>
   );

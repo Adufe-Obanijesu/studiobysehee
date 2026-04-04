@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
   type ReactNode,
+  type RefObject,
 } from "react";
 import Navbar from "@/components/Navbar";
 import { useGSAP } from "@gsap/react";
@@ -34,6 +35,10 @@ type ThemeContextValue = {
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
+/** Ref to a node inside `<main>` (outside `#page-content`) so `position: fixed` overlays are not clipped by transformed ancestors. */
+export const GalleryLightboxPortalContext =
+  createContext<RefObject<HTMLDivElement | null> | null>(null);
+
 export function useTheme(): ThemeContextValue | null {
   return useContext(ThemeContext);
 }
@@ -48,6 +53,7 @@ export function ThemeProvider({
   const [isDark, setIsDark] = useState(initialIsDark);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const circleRef = useRef<HTMLDivElement>(null);
+  const galleryLightboxPortalRef = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {}, { scope: circleRef });
 
@@ -103,7 +109,9 @@ export function ThemeProvider({
 
   return (
     <ThemeContext.Provider value={value}>
+      <GalleryLightboxPortalContext.Provider value={galleryLightboxPortalRef}>
       <main className="bg-background min-h-screen overflow-y-hidden">
+        <div ref={galleryLightboxPortalRef} />
         <div
           ref={circleRef}
           className="fixed z-0 left-1/2 top-1/2 h-4 w-4 scale-0 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none bg-foreground origin-center will-change-transform"
@@ -117,6 +125,7 @@ export function ThemeProvider({
           <Footer />
         </div>
       </main>
+      </GalleryLightboxPortalContext.Provider>
     </ThemeContext.Provider>
   );
 }

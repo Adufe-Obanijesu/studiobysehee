@@ -151,12 +151,18 @@ export function usePreloader() {
         tl.add(createCircleSegment(circleRef.current));
       }
       tl
-      .set("#preloader", { display: "none" })
-      .to(
-        "#navbar, #page-content",
-        { autoAlpha: 1, duration: 0.5, stagger: 0.25 },
-        "<+75%"
+      .to("#preloader", { opacity: 0, duration: .2 }, "<+75%")
+      .fromTo(
+        "#navbar, #page-content, footer",
+        {
+          autoAlpha: 0,
+          scale: 0.95,
+          transformOrigin: "top",
+        },
+        { autoAlpha: 1, scale: 1, duration: 0.5 },
+        "<+55%"
       )
+      .set("#preloader", { display: "none" })
       .set(circleRef.current, { willChange: "auto" });
 
       tl.eventCallback("onComplete", () => {

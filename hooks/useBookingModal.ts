@@ -20,8 +20,7 @@ export function useBookingModal() {
   const scopeRef = useRef<HTMLDivElement>(null);
   const circleRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
-  const openTimelineRef = useRef<gsap.core.Timeline | null>(null);
-  const closeTimelineRef = useRef<gsap.core.Timeline | null>(null);
+  const modalTimelineRef = useRef<gsap.core.Timeline | null>(null);
   const hasOpenedOnceRef = useRef(false);
 
   const [name, setName] = useState("");
@@ -30,6 +29,15 @@ export function useBookingModal() {
   const [location, setLocation] = useState("");
   const [discovery, setDiscovery] = useState("");
   const [message, setMessage] = useState("");
+
+  // const clearForm = () => {
+  //   setName("");
+  //   setEmail("");
+  //   setDateTime("");
+  //   setLocation("");
+  //   setDiscovery("");
+  //   setMessage("");
+  // };
 
   const handleSubmit = useCallback(
     (e: SubmitEvent<HTMLFormElement>) => {
@@ -68,11 +76,57 @@ export function useBookingModal() {
         });
       }
 
+      const applyClosedState = () => {
+        gsap.set(scope, { autoAlpha: 0, pointerEvents: "none" });
+        gsap.set(circle, { scale: 0 });
+        gsap.set(panel, { opacity: 0 });
+        if (fields.length) {
+          gsap.set(fields, { scale: 0, opacity: 1 });
+        }
+        // clearForm();
+      };
+
+      const tl = gsap.timeline({
+        paused: true,
+        onReverseComplete: applyClosedState,
+      });
+
+      tl.to(circle, {
+        scale: () =>
+          (Math.max(window.innerWidth, window.innerHeight) / CIRCLE_PX) * 2.5,
+        duration: DURATION_CIRCLE,
+        ease: EASE_CIRCLE,
+      })
+        .to(
+          panel,
+          {
+            opacity: 1,
+            duration: 0.25,
+          },
+          "-=0.35"
+        )
+        .to(
+          fields,
+          {
+            scale: 1,
+            opacity: 1,
+            duration: 0.55,
+            ease: "back.out(1.7)",
+            stagger: 0.06,
+          },
+          "-=0.2"
+        )
+        .to(
+          "#booking-modal-close-button",
+          { opacity: 1, duration: 0.25 },
+          "-=0.2"
+        );
+
+      modalTimelineRef.current = tl;
+
       return () => {
-        openTimelineRef.current?.kill();
-        openTimelineRef.current = null;
-        closeTimelineRef.current?.kill();
-        closeTimelineRef.current = null;
+        modalTimelineRef.current?.kill();
+        modalTimelineRef.current = null;
       };
     },
     { scope: scopeRef }
@@ -83,7 +137,8 @@ export function useBookingModal() {
       const scope = scopeRef.current;
       const circle = circleRef.current;
       const panel = panelRef.current;
-      if (!scope || !circle || !panel) return;
+      const tl = modalTimelineRef.current;
+      if (!scope || !circle || !panel || !tl) return;
 
       const fields = gsap.utils.toArray<HTMLElement>(
         scope.querySelectorAll(".booking-form-field")
@@ -91,9 +146,6 @@ export function useBookingModal() {
 
       if (isOpen) {
         hasOpenedOnceRef.current = true;
-        closeTimelineRef.current?.kill();
-        closeTimelineRef.current = null;
-        openTimelineRef.current?.kill();
 
         gsap.set(scope, { autoAlpha: 1, pointerEvents: "auto" });
         gsap.set(panel, { opacity: 0 });
@@ -102,85 +154,13 @@ export function useBookingModal() {
           gsap.set(fields, { scale: 0, opacity: 1 });
         }
 
-        const maxSize = Math.max(window.innerWidth, window.innerHeight);
-        const finalScale = (maxSize / CIRCLE_PX) * 2.5;
-
-        const tl = gsap.timeline();
-        tl.to(circle, {
-          scale: finalScale,
-          duration: DURATION_CIRCLE,
-          ease: EASE_CIRCLE,
-        })
-          .to(
-            panel,
-            {
-              opacity: 1,
-              duration: 0.25,
-            },
-            "-=0.35"
-          )
-          .to(
-            fields,
-            {
-              scale: 1,
-              opacity: 1,
-              duration: 0.55,
-              ease: "back.out(1.7)",
-              stagger: 0.06,
-            },
-            "-=0.2"
-          );
-
-        openTimelineRef.current = tl;
+        tl.restart();
         return;
       }
 
       if (!hasOpenedOnceRef.current) return;
 
-      openTimelineRef.current?.kill();
-      openTimelineRef.current = null;
-
-      const ctl = gsap.timeline({
-        onComplete: () => {
-          gsap.set(scope, { autoAlpha: 0, pointerEvents: "none" });
-          gsap.set(circle, { scale: 0 });
-          gsap.set(panel, { opacity: 0 });
-          if (fields.length) {
-            gsap.set(fields, { scale: 0, opacity: 1 });
-          }
-        },
-      });
-
-      if (fields.length) {
-        ctl.to(fields, {
-          scale: 0,
-          opacity: 0,
-          duration: 0.25,
-          ease: "power2.in",
-          stagger: { each: 0.03, from: "end" },
-        });
-      }
-
-      ctl
-        .to(
-          panel,
-          {
-            opacity: 0,
-            duration: 0.2,
-          },
-          fields.length ? "-=0.12" : 0
-        )
-        .to(
-          circle,
-          {
-            scale: 0,
-            duration: DURATION_CIRCLE,
-            ease: EASE_CIRCLE,
-          },
-          "-=0.08"
-        );
-
-      closeTimelineRef.current = ctl;
+      tl.reverse();
     },
     { dependencies: [isOpen], scope: scopeRef }
   );

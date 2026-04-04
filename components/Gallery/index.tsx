@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
+import { createPortal } from "react-dom";
 import { GalleryLightbox } from "./GalleryLightbox";
 import { GalleryGrid } from "./GalleryGrid";
 import { useGalleryFocus } from "@/hooks/useGalleryFocus";
@@ -9,6 +10,7 @@ import { useGalleryImageLoading } from "@/hooks/useGalleryImageLoading";
 import { useGalleryMasonry } from "@/hooks/useGalleryMasonry";
 import { useGalleryMasonryItemRenderer } from "@/hooks/useGalleryMasonryItemRenderer";
 import { useGallerySkeletonLayout } from "@/hooks/useGallerySkeletonLayout";
+import { useGalleryLightboxPortalTarget } from "@/hooks/useGalleryLightboxPortalTarget";
 import type { GalleryProps } from "./types";
 
 export default function Gallery({
@@ -88,27 +90,33 @@ export default function Gallery({
   const isInitialLoading = isLoading && images.length === 0;
   const isLoadingMore = isFetchingMore && images.length > 0;
 
+  const lightboxPortalTarget = useGalleryLightboxPortalTarget();
+
   return (
     <section className="min-h-[calc(100dvh-3.5rem)] w-full px-4 py-4 md:px-6">
-      <GalleryLightbox
-        isOpen={isOpen}
-        activeImage={activeImage}
-        onClose={close}
-        canNavigatePrev={canNavigatePrev}
-        canNavigateNext={canNavigateNext}
-        onNavigatePrev={navigatePrev}
-        onNavigateNext={navigateNext}
-        onPointerDown={onPointerDown}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerCancel}
-        backdropRef={backdropRef}
-        contentWrapperRef={contentWrapperRef}
-        captionMaskRef={captionMaskRef}
-        captionTextRef={captionTextRef}
-        isLightboxImageLoaded={isLightboxImageLoaded}
-        lightboxSizes={lightboxSizes}
-        onImageLoad={markLightboxImageLoaded}
-      />
+      {lightboxPortalTarget != null &&
+        createPortal(
+          <GalleryLightbox
+            isOpen={isOpen}
+            activeImage={activeImage}
+            onClose={close}
+            canNavigatePrev={canNavigatePrev}
+            canNavigateNext={canNavigateNext}
+            onNavigatePrev={navigatePrev}
+            onNavigateNext={navigateNext}
+            onPointerDown={onPointerDown}
+            onPointerUp={onPointerUp}
+            onPointerCancel={onPointerCancel}
+            backdropRef={backdropRef}
+            contentWrapperRef={contentWrapperRef}
+            captionMaskRef={captionMaskRef}
+            captionTextRef={captionTextRef}
+            isLightboxImageLoaded={isLightboxImageLoaded}
+            lightboxSizes={lightboxSizes}
+            onImageLoad={markLightboxImageLoaded}
+          />,
+          lightboxPortalTarget,
+        )}
 
       <GalleryGrid
         images={images}

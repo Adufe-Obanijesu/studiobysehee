@@ -33,7 +33,7 @@ export function useGalleryMasonryItemRenderer({
           width={image.width}
           height={image.height}
           sizes={GALLERY_GRID_IMAGE_SIZES}
-          className={`relative z-10 h-auto w-full object-cover group-hover:scale-105 transition duration-300 ${
+          className={`relative z-10 h-auto w-full object-cover group-hover:scale-105 transition duration-1000 ease-in-out ${
             isImageLoaded(image.id) ? "opacity-100" : "opacity-0"
           }`}
           loading="lazy"

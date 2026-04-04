@@ -111,10 +111,6 @@ export const GalleryGrid = memo(function GalleryGrid({
           ))}
         </div>
       ) : null}
-
-      {!hasMore && totalImages > 0 ? (
-        <p className="py-6 text-center text-sm text-muted-foreground">You reached the end.</p>
-      ) : null}
     </>
   );
 });
