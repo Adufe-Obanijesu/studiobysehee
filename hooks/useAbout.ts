@@ -7,6 +7,10 @@ import { useGalleryLightboxPortalTarget } from "@/hooks/useGalleryLightboxPortal
 
 gsap.registerPlugin(useGSAP, SplitText);
 
+/** Tailwind `lg` — same breakpoint as `usePageEnterTemplate` page enter. */
+const ABOUT_INTRO_LG_MIN_WIDTH_PX = 1024;
+const ABOUT_INTRO_LG_MEDIA = `(min-width: ${ABOUT_INTRO_LG_MIN_WIDTH_PX}px)`;
+
 function getClientRows(clientItems: HTMLElement[]) {
   const rowsByTop = new Map<number, HTMLElement[]>();
   for (const item of clientItems) {
@@ -232,21 +236,42 @@ export function useAbout() {
     },
     {
       scope: containerRef,
-      dependencies: [refreshNamePulseTarget, preloaderComplete, previewPortalTarget],
+      dependencies: [
+        refreshNamePulseTarget,
+        preloaderComplete,
+        previewPortalTarget,
+      ],
     }
   );
 
   useGSAP(
     () => {
-      if (!preloaderComplete || !mobileNavAllowsPageAnimations) return;
+      const lgViewport =
+        typeof window !== "undefined" &&
+        window.matchMedia(ABOUT_INTRO_LG_MEDIA).matches;
+      if (!preloaderComplete) return;
 
       const tl = introTimelineRef.current;
       if (!tl || introPlaybackStartedRef.current) return;
 
+      if (lgViewport) {
+        introPlaybackStartedRef.current = true;
+        tl.play(0);
+        return;
+      }
+
+      if (!mobileNavAllowsPageAnimations) return;
+
       introPlaybackStartedRef.current = true;
       tl.play(0);
     },
-    { dependencies: [preloaderComplete, mobileNavAllowsPageAnimations] }
+    {
+      dependencies: [
+        preloaderComplete,
+        mobileNavAllowsPageAnimations,
+        previewPortalTarget,
+      ],
+    }
   );
 
   useGSAP(

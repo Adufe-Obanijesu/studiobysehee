@@ -192,33 +192,51 @@ export function useNavbar() {
         tl.pause();
         closeTimelineRef.current?.kill();
 
-        closeTimelineRef.current = gsap
-          .timeline({
-            defaults: { ease: EASE },
-            onComplete: () => {
-              if (closingFromOpen) {
-                markMobileNavCloseFinishedRef.current?.();
-              }
-              gsap.set(overlayScopeRef.current, {
-                pointerEvents: "none",
-              });
-              tl.pause(0);
-            },
-          })
-          .to(
-            content,
+        const closeTl = gsap.timeline({
+          defaults: { ease: EASE },
+          onComplete: () => {
+            if (closingFromOpen) {
+              markMobileNavCloseFinishedRef.current?.();
+            }
+            gsap.set(overlayScopeRef.current, {
+              pointerEvents: "none",
+            });
+            tl.pause(0);
+            /* Open timeline at t=0 reapplies content opacity 1 (recorded from last open); force closed state. */
+            gsap.set(content, { opacity: 0 });
+            if (fadeTargets.length) {
+              gsap.set(fadeTargets, { opacity: 0 });
+            }
+          },
+        });
+
+        closeTl.to(
+          content,
+          {
+            opacity: 0,
+            duration: 0.4,
+            stagger: fadeTargets.length ? 0 : 0,
+          },
+          0
+        );
+        if (fadeTargets.length) {
+          closeTl.to(
+            fadeTargets,
             {
               opacity: 0,
-              duration: 0.4,
-              stagger: fadeTargets.length ? 0 : 0,
+              duration: 0.35,
+              ease: EASE,
             },
             0
-          )
-          .to(circle, {
-            scale: 0,
-            duration: 1.2,
-            ease: "power3.inOut",
-          });
+          );
+        }
+        closeTl.to(circle, {
+          scale: 0,
+          duration: 1.2,
+          ease: "power3.inOut",
+        });
+
+        closeTimelineRef.current = closeTl;
       }
     },
     { dependencies: [isMobileMenuOpen] }
