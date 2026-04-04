@@ -4,6 +4,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useMemo,
   useRef,
   useState,
   type ReactNode,
@@ -99,11 +100,14 @@ export function ThemeProvider({
       );
   }, [isDark, isTransitioning]);
 
-  const value: ThemeContextValue = {
-    isDark,
-    isTransitioning,
-    startThemeTransition,
-  };
+  const value = useMemo<ThemeContextValue>(
+    () => ({
+      isDark,
+      isTransitioning,
+      startThemeTransition,
+    }),
+    [isDark, isTransitioning, startThemeTransition],
+  );
 
   // useLenis()
 

@@ -159,7 +159,7 @@ export function usePreloader() {
           scale: 0.95,
           transformOrigin: "top",
         },
-        { autoAlpha: 1, scale: 1, duration: 0.5 },
+        { autoAlpha: 1, scale: 1, duration: 0.5, ease: "sine.out" },
         "<+55%"
       )
       .set("#preloader", { display: "none" })
