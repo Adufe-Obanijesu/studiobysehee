@@ -145,7 +145,7 @@ export function BookingModal() {
 
             <div className="booking-form-field flex flex-wrap gap-3 pt-2">
               <PrimaryCtaButton type="submit">Send request</PrimaryCtaButton>
-              <Button type="button" variant="outline" onClick={close}>
+              <Button type="button" variant="outline" onClick={close} className="h-full">
                 Cancel
               </Button>
             </div>

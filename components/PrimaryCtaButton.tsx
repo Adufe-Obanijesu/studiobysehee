@@ -1,7 +1,8 @@
 import type { ComponentPropsWithoutRef } from "react";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-export type PrimaryCtaButtonProps = ComponentPropsWithoutRef<"button"> & {
+export type PrimaryCtaButtonProps = ComponentPropsWithoutRef<typeof Button> & {
   fullLabel?: string;
   shortLabel?: string;
 };
@@ -11,28 +12,32 @@ export function PrimaryCtaButton({
   fullLabel = "Book a session",
   shortLabel = "Book",
   type = "button",
+  variant = "default",
+  size = "default",
   ...props
 }: PrimaryCtaButtonProps) {
   return (
-    <button
+    <Button
       type={type}
+      variant={variant}
+      size={size}
       className={cn(
-        "block group relative overflow-hidden rounded-md bg-primary px-8 py-4 text-center font-medium text-background lg:px-4 lg:py-2 lg:text-left lg:text-sm",
+        "relative h-auto min-h-0 overflow-hidden rounded-md px-8 py-4 text-center font-medium text-background active:translate-y-0 lg:px-4 lg:py-2 lg:text-left lg:text-sm",
         className
       )}
       {...props}
     >
       <span
-        className="absolute left-1/2 top-1/2 z-10 h-48 w-48 -translate-x-1/2 -translate-y-1/2 scale-0 rounded-full bg-foreground transition-transform transition-ease-400 group-hover:scale-100"
+        className="absolute left-1/2 top-1/2 z-10 h-48 w-48 -translate-x-1/2 -translate-y-1/2 scale-0 rounded-full bg-foreground transition-transform transition-ease-400 group-hover/button:scale-100"
         style={{ transformOrigin: "center center" }}
         aria-hidden
       />
-      <span className="relative z-10 text-light transition-colors transition-ease-300 group-hover:text-background lg:hidden xl:inline-block">
+      <span className="relative z-10 text-light transition-colors transition-ease-300 group-hover/button:text-background lg:hidden xl:inline-block">
         {fullLabel}
       </span>
-      <span className="relative z-10 hidden text-light transition-colors transition-ease-300 group-hover:text-background lg:inline-block xl:hidden">
+      <span className="relative z-10 hidden text-light transition-colors transition-ease-300 group-hover/button:text-background lg:inline-block xl:hidden">
         {shortLabel}
       </span>
-    </button>
+    </Button>
   );
 }
