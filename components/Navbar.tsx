@@ -200,7 +200,7 @@ export default function Navbar() {
         className="pointer-events-none fixed inset-0 z-40 lg:hidden invisible"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="mobile-main-menu-label"
+        aria-label="Main menu"
       >
         <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
           <div

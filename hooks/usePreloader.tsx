@@ -145,7 +145,7 @@ export function usePreloader() {
 
       const tl = gsap.timeline({ paused: false });
       tl.add(createGridIntroSegment(items));
-      tl.add(createGridExitAndIntroSwitchSegment(items), "+=1");
+      tl.add(createGridExitAndIntroSwitchSegment(items), "+=0.35");
       tl.add(createTextRevealSegment(line1Chars, line2Chars));
       if (circleRef.current) {
         tl.add(createCircleSegment(circleRef.current));

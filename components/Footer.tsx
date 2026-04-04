@@ -36,7 +36,7 @@ export default function Footer() {
           </TooltipProvider>
           <BookSessionButton />
         </div>
-        <p className="text-center text-sm text-muted-foreground">
+        <p className="text-center text-sm text-foreground/80">
           &copy; {new Date().getFullYear()} Studio by Sehee. All rights reserved.
         </p>
       </div>

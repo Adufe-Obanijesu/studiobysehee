@@ -77,6 +77,7 @@ export const GalleryGrid = memo(function GalleryGrid({
       <Masonry<GalleryImage>
         items={images}
         render={renderMasonryItem}
+        role="list"
         columnGutter={16}
         rowGutter={16}
         columnCount={Math.max(1, columnCount)}
