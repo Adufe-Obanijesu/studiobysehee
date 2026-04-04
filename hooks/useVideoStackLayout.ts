@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useRef, useState } from "react";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { useGalleryLightboxPortalTarget } from "@/hooks/useGalleryLightboxPortalTarget";
 import type { VideoDataItem, VideoItem } from "@/components/Video/types";
 
 function extractYoutubeId(videoUrl: string): string | null {
@@ -18,6 +19,7 @@ function extractYoutubeId(videoUrl: string): string | null {
 }
 
 export function useVideoStackLayout(videos: VideoDataItem[]) {
+  const fixedOverlaysPortalTarget = useGalleryLightboxPortalTarget();
   const containerRef = useRef<HTMLElement | null>(null);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const [activeVideoId, setActiveVideoId] = useState<string | null>(
@@ -115,6 +117,7 @@ export function useVideoStackLayout(videos: VideoDataItem[]) {
 
   return {
     containerRef,
+    fixedOverlaysPortalTarget,
     videoItems,
     activeVideoId,
     setSectionRef,

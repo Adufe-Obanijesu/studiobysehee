@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { createPortal } from "react-dom";
 import { useVideoStackLayout } from "@/hooks/useVideoStackLayout";
 import type { VideoDataItem } from "./types";
 import { cn } from "@/lib/utils";
@@ -12,6 +13,7 @@ type VideoStackLayoutProps = {
 export default function VideoStackLayout({ videos }: VideoStackLayoutProps) {
   const {
     containerRef,
+    fixedOverlaysPortalTarget,
     videoItems,
     activeVideoId,
     setSectionRef,
@@ -51,57 +53,62 @@ export default function VideoStackLayout({ videos }: VideoStackLayoutProps) {
             </article>
           ))}
         </div>
-
-        {/* Fixed Title Container - Left side (Desktop only) */}
-        <div className="fixed left-6 top-1/2 z-40 hidden h-6 w-60 -translate-y-1/2 overflow-hidden text-foreground/85 xl:block lg:left-16">
-          <div className="relative h-full w-full">
-            {videoItems.map((video) => {
-              const isActive = activeVideoId === video.id;
-              return (
-                <div
-                  key={`title-${video.id}`}
-                  className={cn(
-                    "absolute left-0 top-0 flex h-full w-full items-center text-sm uppercase tracking-[0.2em] transition-transform duration-500 will-change-transform",
-                    isActive ? "translate-y-0" : "translate-y-full"
-                  )}
-                  aria-hidden={!isActive}
-                >
-                  {video.client}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        <aside
-          className="fixed right-16 top-1/2 z-40 hidden -translate-y-1/2 xl:block"
-          aria-label="Video mini map"
-        >
-          <ul className="flex flex-col gap-3">
-            {videoItems.map((video) => (
-              <li key={`mini-${video.id}`}>
-                <button
-                  ref={(node) => setMiniMapItemRef(video.id, node)}
-                  type="button"
-                  onClick={() => scrollToVideo(video.id)}
-                  className={cn("overflow-hidden bg-background transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2")}
-                  aria-label={`Go to ${video.client} video`}
-                  aria-current={activeVideoId === video.id ? "true" : undefined}
-                >
-                  <Image
-                    src={video.thumbnailUrl}
-                    alt={`${video.client} thumbnail`}
-                    width={84}
-                    height={48}
-                    className="h-12 w-[84px] object-cover"
-                    unoptimized
-                  />
-                </button>
-              </li>
-            ))}
-          </ul>
-        </aside>
       </div>
+
+      {fixedOverlaysPortalTarget != null &&
+        createPortal(
+          <>
+            <div className="fixed left-6 top-1/2 z-40 hidden h-6 w-60 -translate-y-1/2 overflow-hidden text-foreground/85 xl:block lg:left-16">
+              <div className="relative h-full w-full">
+                {videoItems.map((video) => {
+                  const isActive = activeVideoId === video.id;
+                  return (
+                    <div
+                      key={`title-${video.id}`}
+                      className={cn(
+                        "absolute left-0 top-0 flex h-full w-full items-center text-sm uppercase tracking-[0.2em] transition-transform duration-500 will-change-transform",
+                        isActive ? "translate-y-0" : "translate-y-full"
+                      )}
+                      aria-hidden={!isActive}
+                    >
+                      {video.client}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <aside
+              className="fixed right-16 top-1/2 z-40 hidden -translate-y-1/2 xl:block"
+              aria-label="Video mini map"
+            >
+              <ul className="flex flex-col gap-3">
+                {videoItems.map((video) => (
+                  <li key={`mini-${video.id}`}>
+                    <button
+                      ref={(node) => setMiniMapItemRef(video.id, node)}
+                      type="button"
+                      onClick={() => scrollToVideo(video.id)}
+                      className={cn("overflow-hidden bg-background transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2")}
+                      aria-label={`Go to ${video.client} video`}
+                      aria-current={activeVideoId === video.id ? "true" : undefined}
+                    >
+                      <Image
+                        src={video.thumbnailUrl}
+                        alt={`${video.client} thumbnail`}
+                        width={84}
+                        height={48}
+                        className="h-12 w-[84px] object-cover"
+                        unoptimized
+                      />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </aside>
+          </>,
+          fixedOverlaysPortalTarget,
+        )}
       {/* <div className="hidden lg:block xl:hidden h-60"></div> */}
     </section>
   );
