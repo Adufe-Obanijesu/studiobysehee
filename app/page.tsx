@@ -1,19 +1,5 @@
-"use client";
-
-import Gallery from "@/components/Gallery";
-import { useFashionBeautyGalleryQuery } from "@/hooks/useFashionBeautyGalleryQuery";
+import HomePageContent from "@/components/HomePageContent";
 
 export default function Home() {
-  const { images, isLoading, isFetchingMore, hasMore, loadMore } =
-    useFashionBeautyGalleryQuery();
-
-  return (
-    <Gallery
-      images={images}
-      isLoading={isLoading}
-      isFetchingMore={isFetchingMore}
-      hasMore={hasMore}
-      loadMore={loadMore}
-    />
-  );
+  return <HomePageContent />;
 }
