@@ -62,7 +62,7 @@ export function SvgModernAge(props: React.SVGProps<SVGSVGElement>) {
 
 export function Papyrus(props: React.SVGProps<SVGSVGElement>) {
   return (
-    <Image src="/brands/papyrus.webp" alt="Papyrus" width={263} height={111} className="h-full w-auto object-contain" />
+    <Image src="/brands/papyrus.webp" alt="Papyrus" loading="eager" fetchPriority="high" priority width={263} height={111} className="h-full w-auto object-contain" />
   );
 }
 

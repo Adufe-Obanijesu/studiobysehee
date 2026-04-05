@@ -12,7 +12,7 @@ export type SocialLink = {
 export const NAV_LINKS: NavLink[] = [
   { label: "Fashion | Beauty", href: "/" },
   { label: "People", href: "/people" },
-  { label: "Video", href: "/video" },
+  { label: "Video", href: "/videos" },
   { label: "Testimonials", href: "/testimonials" },
   { label: "About | Contact", href: "/about" },
 ];

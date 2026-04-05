@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { createPortal } from "react-dom";
 import { useVideoStackLayout } from "@/hooks/useVideoStackLayout";
+import LazyVideoEmbed from "./LazyVideoEmbed";
 import type { VideoDataItem } from "./types";
 import { cn } from "@/lib/utils";
 
@@ -37,14 +38,10 @@ export default function VideoStackLayout({ videos }: VideoStackLayoutProps) {
               data-video-section={video.id}
             >
               <div className="overflow-hidden rounded-md bg-muted">
-                <iframe
-                  className="aspect-video w-full"
-                  src={video.embedUrl}
-                  title={`${video.client} video`}
-                  loading="lazy"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  allowFullScreen
+                <LazyVideoEmbed
+                  embedUrl={video.embedUrl}
+                  thumbnailUrl={video.thumbnailUrl}
+                  title={video.client}
                 />
               </div>
               <p className="mt-4 text-center text-sm uppercase tracking-[0.2em] text-foreground/85 xl:hidden">
@@ -58,7 +55,7 @@ export default function VideoStackLayout({ videos }: VideoStackLayoutProps) {
       {fixedOverlaysPortalTarget != null &&
         createPortal(
           <>
-            <div className="fixed left-6 top-1/2 z-40 hidden h-6 w-60 -translate-y-1/2 overflow-hidden text-foreground/85 xl:block lg:left-16">
+            <div className="fixed left-6 top-1/2 z-10 hidden h-6 w-60 -translate-y-1/2 overflow-hidden text-foreground/85 xl:block lg:left-16">
               <div className="relative h-full w-full">
                 {videoItems.map((video) => {
                   const isActive = activeVideoId === video.id;
@@ -79,7 +76,7 @@ export default function VideoStackLayout({ videos }: VideoStackLayoutProps) {
             </div>
 
             <aside
-              className="fixed right-16 top-1/2 z-40 hidden -translate-y-1/2 xl:block"
+              className="fixed right-16 top-1/2 z-10 hidden -translate-y-1/2 xl:block"
               aria-label="Video mini map"
             >
               <ul className="flex flex-col gap-3">
@@ -99,7 +96,7 @@ export default function VideoStackLayout({ videos }: VideoStackLayoutProps) {
                         width={84}
                         height={48}
                         className="h-12 w-[84px] object-cover"
-                        unoptimized
+                        loading="lazy"
                       />
                     </button>
                   </li>

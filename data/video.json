@@ -3,42 +3,42 @@
     "id": "video-215683596",
     "client": "BLACKPINK [ENCORE]",
     "videoUrl": "https://youtube.com/watch?v=35XABEDIR7k",
-    "thumbnail": "/thumbnails/blackpink [encore].jpg"
+    "thumbnail": "https://i.ytimg.com/vi/35XABEDIR7k/maxresdefault.jpg"
   },
   {
     "id": "video-215681565",
     "client": "ENHYPEN [FATE]",
     "videoUrl": "https://youtube.com/watch?v=97EWF_XDuTs",
-    "thumbnail": "/thumbnails/enhyphen [fate].jpg"
+    "thumbnail": "https://i.ytimg.com/vi/97EWF_XDuTs/maxresdefault.jpg"
   },
   {
     "id": "video-285568014",
     "client": "ATEEZ [BOUNCY]",
     "videoUrl": "https://youtube.com/watch?v=oZHxE2GPpGE",
-    "thumbnail": "/thumbnails/ateez [bouncy].jpg"
+    "thumbnail": "https://i.ytimg.com/vi/oZHxE2GPpGE/maxresdefault.jpg"
   },
   {
     "id": "video-285568015",
     "client": "ATEEZ [HALAZIA]",
     "videoUrl": "https://youtube.com/watch?v=JlxgA6usGvY",
-    "thumbnail": "/thumbnails/ateez [halazia].jpg"
+    "thumbnail": "https://i.ytimg.com/vi/JlxgA6usGvY/maxresdefault.jpg"
   },
   {
     "id": "video-285568016",
     "client": "ATEEZ [ARRIBA]",
     "videoUrl": "https://youtube.com/watch?v=jriUlWlCdp0",
-    "thumbnail": "/thumbnails/ateez [arriba].jpg"
+    "thumbnail": "https://i.ytimg.com/vi/jriUlWlCdp0/maxresdefault.jpg"
   },
   {
     "id": "video-285566718",
     "client": "ENHYPEN [LOOSE]",
     "videoUrl": "https://youtube.com/watch?v=4a-W2cypGAo",
-    "thumbnail": "/thumbnails/enhyphen [loose].jpg"
+    "thumbnail": "https://i.ytimg.com/vi/4a-W2cypGAo/maxresdefault.jpg"
   },
   {
     "id": "video-215681227",
     "client": "(G)I-DLE [I AM FREE-TY]",
     "videoUrl": "https://youtube.com/watch?v=6g_qFnZjsxQ",
-    "thumbnail": "/thumbnails/(G)i-dle [i am free-ty].jpg"
+    "thumbnail": "https://i.ytimg.com/vi/6g_qFnZjsxQ/maxresdefault.jpg"
   }
 ]
