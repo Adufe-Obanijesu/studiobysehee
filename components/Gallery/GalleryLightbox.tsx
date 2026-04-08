@@ -5,7 +5,6 @@ import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
 import { HiOutlineX, HiChevronLeft, HiChevronRight } from "react-icons/hi";
 import { cn } from "@/lib/utils";
-import { getGalleryPlaceholderClass } from "./getGalleryPlaceholderClass";
 import type { GalleryImage } from "./types";
 
 export type GalleryLightboxProps = {
@@ -136,7 +135,7 @@ export function GalleryLightbox({
             )}
             {isLightboxImageFailed && (
               <div
-                className={`absolute inset-0 rounded-xl ${getGalleryPlaceholderClass(activeImage.id)}`}
+                className={`absolute inset-0 rounded-xl bg-linear-to-br from-rose-200/70 via-orange-200/60 to-amber-200/70`}
               />
             )}
             <Image

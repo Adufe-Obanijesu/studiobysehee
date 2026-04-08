@@ -5,7 +5,6 @@ import Image from "next/image";
 import type { RenderComponentProps } from "masonic";
 import { Skeleton } from "@/components/ui/skeleton";
 import { GALLERY_GRID_IMAGE_SIZES } from "@/components/Gallery/constants";
-import { getGalleryPlaceholderClass } from "@/components/Gallery/getGalleryPlaceholderClass";
 import type { GalleryImage } from "@/components/Gallery/types";
 
 type Params = {
@@ -39,7 +38,7 @@ export function useGalleryMasonryItemRenderer({
           )}
           {imageFailed && (
             <div
-              className={`pointer-events-none absolute inset-0 z-10 rounded-none ${getGalleryPlaceholderClass(image.id)}`}
+              className={`pointer-events-none absolute inset-0 z-10 rounded-none bg-linear-to-br from-rose-200/70 via-orange-200/60 to-amber-200/70`}
             />
           )}
           <Image
