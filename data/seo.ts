@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 import {
-  ABOUT_BIO_REST,
   ABOUT_NAME,
-  ABOUT_PORTRAIT_HEIGHT,
-  ABOUT_PORTRAIT_SRC,
-  ABOUT_PORTRAIT_WIDTH,
 } from "./about";
 
 export const SITE_NAME = "Studio by Sehee";
+const OG_IMAGE_PATH = "/og.png";
+const OG_IMAGE_WIDTH = 1280;
+const OG_IMAGE_HEIGHT = 905;
 
 export type SeoPath = "/" | "/people" | "/videos" | "/testimonials" | "/about";
 
@@ -30,24 +29,24 @@ function toCanonical(path: SeoPath): string {
 
 const PAGE_SEO: Record<SeoPath, { title: string; description: string }> = {
   "/": {
-    title: "Fashion & Beauty",
-    description: `${ABOUT_NAME} ${ABOUT_BIO_REST} Browse fashion, beauty, and commercial photography.`,
+    title: "Studio by Sehee | NYC Fashion & Lifestyle - Photographer & Cinematographer",
+    description: "Studio by Sehee is a New York based fashion and beauty photographer capturing editorial, commercial, and brand storytelling with a cinematic eye. Available for fashion campaigns, lookbooks, beauty editorials, and creative projects across New York City.",
   },
   "/people": {
-    title: "People",
-    description: `Portrait and people photography by ${ABOUT_NAME}, New York — editorial and commercial work.`,
+    title: "Studio by Sehee | People - Photographer & Cinematographer",
+    description: "New York lifestyle and portrait photography by Studio by Sehee. Capturing authentic moments, engagements, weddings, elopement, couples, family and personal stories across New York City with a cinematic and documentary style.",
   },
   "/videos": {
-    title: "Video",
-    description: `Selected motion and video work by ${ABOUT_NAME} — fashion, beauty, and commercial projects.`,
+    title: "Studio by Sehee | Video - Photographer & Cinematographer",
+    description: "Video and cinematography by Studio by Sehee, a New York based filmmaker capturing fashion, commercial, and lifestyle stories. Available for brand campaigns, editorial projects, and creative video production across New York City.",
   },
   "/testimonials": {
-    title: "Testimonials",
-    description: `Client testimonials for ${ABOUT_NAME} and ${SITE_NAME}.`,
+    title: "Studio by Sehee | Testimonials - Photographer & Cinematographer",
+    description: "Client testimonials and reviews for Studio by Sehee, a New York based photographer and cinematographer known for capturing authentic moments and creative visual storytelling across fashion, commercial, and lifestyle photography.",
   },
   "/about": {
-    title: "About & Contact",
-    description: `${ABOUT_NAME} ${ABOUT_BIO_REST} Selected clients, contact, and booking.`,
+    title: "Studio by Sehee | About - Photographer & Cinematographer",
+    description: "Meet Sehee, a New York based photographer and cinematographer behind Studio by Sehee. Specializing in fashion, commercial, and lifestyle photography, capturing real moments and creative stories across New York City.",
   },
 };
 
@@ -55,10 +54,17 @@ export function buildRootLayoutMetadata(): Metadata {
   const home = PAGE_SEO["/"];
   return {
     metadataBase: toMetadataBase(),
-    title: {
-      default: `${home.title} | ${SITE_NAME}`,
-      template: `%s | ${SITE_NAME}`,
+    manifest: "/logo/site.webmanifest",
+    icons: {
+      icon: [
+        { url: "/logo/favicon.ico" },
+        { url: "/logo/favicon.svg", type: "image/svg+xml" },
+        { url: "/logo/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+      ],
+      apple: [{ url: "/logo/apple-touch-icon.png", sizes: "180x180" }],
+      shortcut: [{ url: "/logo/favicon.ico" }],
     },
+    title: home.title,
     description: home.description,
     robots: { index: true, follow: true },
     openGraph: {
@@ -67,15 +73,16 @@ export function buildRootLayoutMetadata(): Metadata {
       siteName: SITE_NAME,
       images: [
         {
-          url: ABOUT_PORTRAIT_SRC,
-          width: ABOUT_PORTRAIT_WIDTH,
-          height: ABOUT_PORTRAIT_HEIGHT,
-          alt: `Portrait of ${ABOUT_NAME}`,
+          url: OG_IMAGE_PATH,
+          width: OG_IMAGE_WIDTH,
+          height: OG_IMAGE_HEIGHT,
+          alt: `${SITE_NAME} - ${ABOUT_NAME}`,
         },
       ],
     },
     twitter: {
       card: "summary_large_image",
+      images: [OG_IMAGE_PATH],
     },
   };
 }
@@ -83,19 +90,27 @@ export function buildRootLayoutMetadata(): Metadata {
 export function buildMetadataForPath(path: SeoPath): Metadata {
   const { title, description } = PAGE_SEO[path];
   const canonical = toCanonical(path);
-  const ogTitle = `${title} | ${SITE_NAME}`;
   return {
-    title,
+    title: { absolute: title },
     description,
     alternates: { canonical },
     openGraph: {
       url: canonical,
-      title: ogTitle,
+      title,
       description,
+      images: [
+        {
+          url: OG_IMAGE_PATH,
+          width: OG_IMAGE_WIDTH,
+          height: OG_IMAGE_HEIGHT,
+          alt: `${SITE_NAME} - ${ABOUT_NAME}`,
+        },
+      ],
     },
     twitter: {
-      title: ogTitle,
+      title,
       description,
+      images: [OG_IMAGE_PATH],
     },
   };
 }
