@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { TransitionLink as Link } from "@/components/TransitionLink";
 import { FaInstagram, FaLinkedin, FaPinterest } from "react-icons/fa";
 import { SiImdb } from "react-icons/si";
 import ThemeToggle from "@/components/ThemeToggle";

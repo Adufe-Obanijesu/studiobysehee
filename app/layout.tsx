@@ -10,6 +10,8 @@ import Preloader from "@/components/Preloader";
 import QueryProvider from "@/components/QueryProvider";
 import { BookingModal } from "@/components/BookingModal";
 import Navbar from "@/components/Navbar";
+import { PageTransitionProvider } from "@/context/PageTransitionContext";
+import { PageTransitionLoader } from "@/components/PageTransitionLoader";
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -50,21 +52,24 @@ export default async function RootLayout({
       <body
         className={`relative ${cormorant.variable} ${dmSans.variable} font-dm antialiased`}
       >
-        <BookingProvider>
-          <PreloaderProvider>
-            <ThemeProvider initialIsDark={initialIsDark}>
-                <Navbar />
-              <QueryProvider>
-                <Preloader />
-                <div id="page-content" className="invisible">
-                  {children}
-                </div>
-                {/* <CustomCursor /> */}
-              </QueryProvider>
-            </ThemeProvider>
-          </PreloaderProvider>
-          <BookingModal />
-        </BookingProvider>
+        <PageTransitionProvider>
+          <PageTransitionLoader />
+          <BookingProvider>
+            <PreloaderProvider>
+              <ThemeProvider initialIsDark={initialIsDark}>
+                  <Navbar />
+                <QueryProvider>
+                  <Preloader />
+                  <div id="page-content" className="invisible">
+                    {children}
+                  </div>
+                  {/* <CustomCursor /> */}
+                </QueryProvider>
+              </ThemeProvider>
+            </PreloaderProvider>
+            <BookingModal />
+          </BookingProvider>
+        </PageTransitionProvider>
       </body>
     </html>
   );

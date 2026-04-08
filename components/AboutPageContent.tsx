@@ -2,7 +2,7 @@
 
 import { createPortal } from "react-dom";
 import Image from "next/image";
-import Link from "next/link";
+import { TransitionLink as Link } from "@/components/TransitionLink";
 import { useAbout } from "@/hooks/useAbout";
 import { useNavLinkHover } from "@/hooks/useNavbar";
 import {

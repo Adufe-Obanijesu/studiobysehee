@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { TransitionLink as Link } from "@/components/TransitionLink";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import { SOCIAL_LINKS } from "@/data/navbar";
 import { BookSessionButton } from "@/components/BookSessionButton";
