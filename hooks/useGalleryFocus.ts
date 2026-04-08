@@ -86,6 +86,7 @@ export function useGalleryFocus({
   const [activeIndex, setActiveIndex] = useState(0);
   const [openCounter, setOpenCounter] = useState(0);
   const [isLightboxImageLoaded, setIsLightboxImageLoaded] = useState(false);
+  const [isLightboxImageFailed, setIsLightboxImageFailed] = useState(false);
 
   const backdropRef = useRef<HTMLDivElement | null>(null);
   const contentWrapperRef = useRef<HTMLDivElement | null>(null);
@@ -175,6 +176,7 @@ export function useGalleryFocus({
 
       setActiveIndex(index);
       setIsLightboxImageLoaded(false);
+      setIsLightboxImageFailed(false);
       setIsOpen(true);
       setOpenCounter((c) => c + 1);
       openImageIndexRef.current = index;
@@ -187,6 +189,7 @@ export function useGalleryFocus({
     if (next < 0 || next >= imagesRef.current.length) return;
     setActiveIndex(next);
     setIsLightboxImageLoaded(false);
+    setIsLightboxImageFailed(false);
   }, []);
 
   const navigatePrev = useCallback(() => navigate(-1), [navigate]);
@@ -385,6 +388,12 @@ export function useGalleryFocus({
 
   const markLightboxImageLoaded = useCallback(() => {
     setIsLightboxImageLoaded(true);
+    setIsLightboxImageFailed(false);
+  }, []);
+
+  const markLightboxImageFailed = useCallback(() => {
+    setIsLightboxImageLoaded(false);
+    setIsLightboxImageFailed(true);
   }, []);
 
   return {
@@ -394,8 +403,10 @@ export function useGalleryFocus({
     canNavigatePrev: activeIndex > 0,
     canNavigateNext: activeIndex < images.length - 1,
     isLightboxImageLoaded,
+    isLightboxImageFailed,
     lightboxSizes: GALLERY_LIGHTBOX_IMAGE_SIZES,
     markLightboxImageLoaded,
+    markLightboxImageFailed,
     backdropRef,
     contentWrapperRef,
     captionMaskRef,

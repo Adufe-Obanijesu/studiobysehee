@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
 import { HiOutlineX, HiChevronLeft, HiChevronRight } from "react-icons/hi";
 import { cn } from "@/lib/utils";
+import { getGalleryPlaceholderClass } from "./getGalleryPlaceholderClass";
 import type { GalleryImage } from "./types";
 
 export type GalleryLightboxProps = {
@@ -23,8 +24,10 @@ export type GalleryLightboxProps = {
   captionMaskRef: RefObject<HTMLDivElement | null>;
   captionTextRef: RefObject<HTMLParagraphElement | null>;
   isLightboxImageLoaded: boolean;
+  isLightboxImageFailed: boolean;
   lightboxSizes: string;
   onImageLoad: () => void;
+  onImageError: () => void;
 };
 
 export function GalleryLightbox({
@@ -43,8 +46,10 @@ export function GalleryLightbox({
   captionMaskRef,
   captionTextRef,
   isLightboxImageLoaded,
+  isLightboxImageFailed,
   lightboxSizes,
   onImageLoad,
+  onImageError,
 }: GalleryLightboxProps) {
   if (!isOpen || !activeImage) return null;
 
@@ -126,7 +131,14 @@ export function GalleryLightbox({
               maxHeight: "85dvh",
             }}
           >
-            <Skeleton className="absolute inset-0 rounded-xl" />
+            {!isLightboxImageFailed && (
+              <Skeleton className="absolute inset-0 rounded-xl" />
+            )}
+            {isLightboxImageFailed && (
+              <div
+                className={`absolute inset-0 rounded-xl ${getGalleryPlaceholderClass(activeImage.id)}`}
+              />
+            )}
             <Image
               fill
               src={activeImage.src}
@@ -139,6 +151,7 @@ export function GalleryLightbox({
               unoptimized
               loading="eager"
               onLoad={onImageLoad}
+              onError={onImageError}
             />
           </div>
           <div ref={captionMaskRef} className="overflow-hidden">
