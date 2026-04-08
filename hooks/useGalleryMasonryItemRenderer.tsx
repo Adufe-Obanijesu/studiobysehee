@@ -47,12 +47,16 @@ export function useGalleryMasonryItemRenderer({
             width={image.width}
             height={image.height}
             sizes={GALLERY_GRID_IMAGE_SIZES}
-            className={`relative z-10 h-auto w-full object-cover group-hover:scale-105 transition duration-1000 ease-in-out ${
+            className={`relative z-10 h-auto w-full object-cover ${
               isImageLoaded(image.id) ? "opacity-100" : "opacity-0"
             }`}
             loading="lazy"
             onLoad={() => markImageLoaded(image.id)}
             onError={() => markImageFailed(image.id)}
+          />
+          <div
+            className="pointer-events-none absolute inset-0 z-15 rounded-xl bg-black/0 transition-colors duration-300 ease-out group-hover:bg-foreground/35"
+            aria-hidden
           />
           <button
             type="button"
