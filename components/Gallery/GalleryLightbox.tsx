@@ -158,7 +158,7 @@ export function GalleryLightbox({
               ref={captionTextRef}
               className="text-sm text-foreground/90 md:text-base text-center"
             >
-              {activeImage.alt || "Gallery image"}
+              {activeImage.alt}
             </p>
           </div>
         </div>
