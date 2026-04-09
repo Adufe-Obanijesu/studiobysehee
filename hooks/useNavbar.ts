@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { usePathname } from "next/navigation";
 import { usePreloaderContext } from "@/context/PreloaderContext";
 import { NAV_LINKS, SOCIAL_LINKS } from "@/data/navbar";
 
@@ -13,6 +14,7 @@ const ICON_DURATION = 0.3;
 
 export function useNavbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
   const uiGate = usePreloaderContext();
   const markMobileNavCloseStartedRef = useRef(uiGate?.markMobileNavCloseStarted);
   const markMobileNavCloseFinishedRef = useRef(uiGate?.markMobileNavCloseFinished);
@@ -321,6 +323,16 @@ export function useNavbar() {
     setIsMobileMenuOpen((prev) => !prev);
   }, []);
 
+  const isActiveLink = useCallback(
+    (href: string) => {
+      if (href === "/") {
+        return pathname === "/";
+      }
+      return pathname === href || pathname.startsWith(`${href}/`);
+    },
+    [pathname]
+  );
+
   return {
     navLinks: NAV_LINKS,
     socialLinks: SOCIAL_LINKS,
@@ -337,6 +349,7 @@ export function useNavbar() {
     menuIconRef,
     closeIconRef,
     handleMobileToggleClick,
+    isActiveLink,
   };
 }
 

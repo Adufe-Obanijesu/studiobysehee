@@ -16,13 +16,16 @@ import {
 } from "@/components/ui/tooltip";
 import { BookSessionButton } from "@/components/BookSessionButton";
 
-function AnimatedNavLink({ link }: { link: NavLink }) {
+function AnimatedNavLink({ link, isActive }: { link: NavLink; isActive: boolean }) {
   const { wrapperRef, line1Ref, line2Ref, onMouseEnter, onMouseLeave } =
     useNavLinkHover();
   return (
     <Link
       href={link.href}
-      className="text-sm text-foreground inline-block leading-tight"
+      className={cn(
+        "text-sm inline-block leading-tight py-2 px-4 rounded-full text-foreground",
+        isActive ? "bg-muted" : "bg-transparent"
+      )}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
@@ -30,19 +33,13 @@ function AnimatedNavLink({ link }: { link: NavLink }) {
         ref={wrapperRef}
         className="relative inline-block h-[1.2em] leading-tight align-middle"
       >
-        <span aria-hidden className="invisible block leading-tight pr-1">
+        <span aria-hidden className="invisible block leading-tight" >
           {link.label}
         </span>
-        <span
-          ref={line1Ref}
-          className="absolute top-0 left-0 block leading-tight"
-        >
+        <span ref={line1Ref} className="absolute top-0 left-0 block leading-tight">
           {link.label}
         </span>
-        <span
-          ref={line2Ref}
-          className="absolute top-0 left-0 block leading-tight"
-        >
+        <span ref={line2Ref} className="absolute top-0 left-0 block leading-tight">
           {link.label}
         </span>
       </span>
@@ -93,6 +90,7 @@ export default function Navbar() {
     menuIconRef,
     closeIconRef,
     handleMobileToggleClick,
+    isActiveLink,
   } = useNavbar();
 
   return (
@@ -126,7 +124,7 @@ export default function Navbar() {
           <ul className="hidden lg:flex items-center gap-6 justify-center">
             {navLinks.map((link) => (
               <li key={link.href}>
-                <AnimatedNavLink link={link} />
+                <AnimatedNavLink link={link} isActive={isActiveLink(link.href)} />
               </li>
             ))}
           </ul>
@@ -221,11 +219,18 @@ export default function Navbar() {
           >
             <ul
               ref={mobileLinksRef}
-              className="flex flex-col gap-6 text-3xl"
+              className="flex flex-col gap-4 text-3xl"
             >
               {navLinks.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} onClick={closeMobileMenu} className="mobile-nav-link inline-block scale-0 text-foreground font-cormorant">
+                  <Link
+                    href={link.href}
+                    onClick={closeMobileMenu}
+                    className={cn(
+                      "mobile-nav-link inline-block scale-0 font-cormorant py-2 px-4",
+                      isActiveLink(link.href) ? "bg-muted rounded-full" : "text-foreground"
+                    )}
+                  >
                     {link.label}
                   </Link>
                 </li>
