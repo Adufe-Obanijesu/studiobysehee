@@ -4,6 +4,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -56,6 +57,25 @@ export function ThemeProvider({
   const galleryLightboxPortalRef = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {}, { scope: circleRef });
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const isModifierPressed = event.ctrlKey || event.metaKey;
+      const key = event.key.toLowerCase();
+
+      if (!isModifierPressed) return;
+
+      if (key === "s" || key === "u" || key === "p") {
+        event.preventDefault();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   const startThemeTransition = useCallback(() => {
     const el = circleRef.current;
@@ -114,7 +134,7 @@ export function ThemeProvider({
     <ThemeContext.Provider value={value}>
       <GalleryLightboxPortalContext.Provider value={galleryLightboxPortalRef}>
       <main className="bg-background min-h-screen overflow-y-hidden">
-        <div ref={galleryLightboxPortalRef} />
+        <div ref={galleryLightboxPortalRef} className="portalled-el invisible" />
         <div
           ref={circleRef}
           className="fixed z-0 left-1/2 top-1/2 h-4 w-4 scale-0 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none bg-foreground origin-center will-change-transform"

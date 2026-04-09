@@ -16,6 +16,7 @@ import {
 } from "@/data/about";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ImageCopyrightContextMenu } from "@/components/ui/image-copyright-context-menu";
 import { HiOutlineX } from "react-icons/hi";
 
 type AnimatedAboutLinkProps = {
@@ -125,29 +126,31 @@ export default function AboutPageContent() {
               <HiOutlineX className="size-6 relative z-10" aria-hidden />
             </button>
 
-            <div
-              ref={previewImageContainerRef}
-              data-about-preview-image
-              className="relative z-10 overflow-hidden rounded-xl"
-              style={{
-                width: "min(85vw, 900px)",
-                aspectRatio: `${ABOUT_PORTRAIT_WIDTH} / ${ABOUT_PORTRAIT_HEIGHT}`,
-              }}
-            >
-              <Skeleton className="absolute inset-0 rounded-xl" />
-              <Image
-                fill
-                src={ABOUT_PORTRAIT_SRC}
-                alt="Portrait of Sehee Kim"
-                priority
-                sizes="min(85vw, 900px)"
-                className={cn(
-                  "relative z-10 object-cover transition-opacity duration-300",
-                  isImageLoaded ? "opacity-100" : "opacity-0"
-                )}
-                onLoad={handleImageLoad}
-              />
-            </div>
+            <ImageCopyrightContextMenu>
+              <figure
+                ref={previewImageContainerRef}
+                data-about-preview-image
+                className="relative z-10 overflow-hidden rounded-xl"
+                style={{
+                  width: "min(85vw, 900px)",
+                  aspectRatio: `${ABOUT_PORTRAIT_WIDTH} / ${ABOUT_PORTRAIT_HEIGHT}`,
+                }}
+              >
+                <Skeleton className="absolute inset-0 rounded-xl" />
+                <Image
+                  fill
+                  src={ABOUT_PORTRAIT_SRC}
+                  alt="Portrait of Sehee Kim"
+                  priority
+                  sizes="min(85vw, 900px)"
+                  className={cn(
+                    "relative z-10 object-cover transition-opacity duration-300",
+                    isImageLoaded ? "opacity-100" : "opacity-0"
+                  )}
+                  onLoad={handleImageLoad}
+                />
+              </figure>
+            </ImageCopyrightContextMenu>
           </div>,
           previewPortalTarget,
         )

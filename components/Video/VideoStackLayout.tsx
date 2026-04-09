@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { createPortal } from "react-dom";
 import { useVideoStackLayout } from "@/hooks/useVideoStackLayout";
+import { ImageCopyrightContextMenu } from "@/components/ui/image-copyright-context-menu";
 import LazyVideoEmbed from "./LazyVideoEmbed";
 import type { VideoDataItem } from "./types";
 import { cn } from "@/lib/utils";
@@ -76,29 +77,31 @@ export default function VideoStackLayout({ videos }: VideoStackLayoutProps) {
             </div>
 
             <aside
-              className="fixed right-16 top-1/2 z-10 hidden -translate-y-1/2 xl:block"
+              className="fixed right-16 top-1/2 z-20 hidden -translate-y-1/2 xl:block"
               aria-label="Video mini map"
             >
               <ul className="flex flex-col gap-3">
                 {videoItems.map((video) => (
                   <li key={`mini-${video.id}`}>
-                    <button
-                      ref={(node) => setMiniMapItemRef(video.id, node)}
-                      type="button"
-                      onClick={() => scrollToVideo(video.id)}
-                      className={cn("overflow-hidden bg-background transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2")}
-                      aria-label={`Go to ${video.client} video`}
-                      aria-current={activeVideoId === video.id ? "true" : undefined}
-                    >
-                      <Image
-                        src={video.thumbnailUrl}
-                        alt={`${video.client} thumbnail`}
-                        width={84}
-                        height={48}
-                        className="h-12 w-[84px] object-cover"
-                        loading="lazy"
-                      />
-                    </button>
+                    <ImageCopyrightContextMenu>
+                      <button
+                        ref={(node) => setMiniMapItemRef(video.id, node)}
+                        type="button"
+                        onClick={() => scrollToVideo(video.id)}
+                        className={cn("overflow-hidden bg-background transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2")}
+                        aria-label={`Go to ${video.client} video`}
+                        aria-current={activeVideoId === video.id ? "true" : undefined}
+                      >
+                        <Image
+                          src={video.thumbnailUrl}
+                          alt={`${video.client} thumbnail`}
+                          width={84}
+                          height={48}
+                          className="h-12 w-[84px] object-cover"
+                          loading="lazy"
+                        />
+                      </button>
+                    </ImageCopyrightContextMenu>
                   </li>
                 ))}
               </ul>

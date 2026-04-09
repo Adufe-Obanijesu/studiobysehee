@@ -3,6 +3,7 @@
 import type { RefObject } from "react";
 import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ImageCopyrightContextMenu } from "@/components/ui/image-copyright-context-menu";
 import { HiOutlineX, HiChevronLeft, HiChevronRight } from "react-icons/hi";
 import { cn } from "@/lib/utils";
 import type { GalleryImage } from "./types";
@@ -123,36 +124,38 @@ export function GalleryLightbox({
             width: `min(100%, calc(85dvh * (${activeImage.width} / ${activeImage.height})), 64rem)`,
           }}
         >
-          <div
-            className="relative overflow-hidden rounded-xl"
-            style={{
-              aspectRatio: `${activeImage.width} / ${activeImage.height}`,
-              maxHeight: "85dvh",
-            }}
-          >
-            {!isLightboxImageFailed && (
-              <Skeleton className="absolute inset-0 rounded-xl" />
-            )}
-            {isLightboxImageFailed && (
-              <div
-                className={`absolute inset-0 rounded-xl bg-linear-to-br from-rose-200/70 via-orange-200/60 to-amber-200/70`}
+          <ImageCopyrightContextMenu>
+            <figure
+              className="relative overflow-hidden rounded-xl"
+              style={{
+                aspectRatio: `${activeImage.width} / ${activeImage.height}`,
+                maxHeight: "85dvh",
+              }}
+            >
+              {!isLightboxImageFailed && (
+                <Skeleton className="absolute inset-0 rounded-xl" />
+              )}
+              {isLightboxImageFailed && (
+                <div
+                  className={`absolute inset-0 rounded-xl bg-linear-to-br from-rose-200/70 via-orange-200/60 to-amber-200/70`}
+                />
+              )}
+              <Image
+                fill
+                src={activeImage.src}
+                alt={activeImage.alt || "Gallery image"}
+                className={`relative z-10 object-contain transition-opacity duration-300 rounded-xl ${
+                  isLightboxImageLoaded ? "opacity-100" : "opacity-0"
+                }`}
+                sizes={lightboxSizes}
+                priority
+                unoptimized
+                loading="eager"
+                onLoad={onImageLoad}
+                onError={onImageError}
               />
-            )}
-            <Image
-              fill
-              src={activeImage.src}
-              alt={activeImage.alt || "Gallery image"}
-              className={`relative z-10 object-contain transition-opacity duration-300 ${
-                isLightboxImageLoaded ? "opacity-100" : "opacity-0"
-              }`}
-              sizes={lightboxSizes}
-              priority
-              unoptimized
-              loading="eager"
-              onLoad={onImageLoad}
-              onError={onImageError}
-            />
-          </div>
+            </figure>
+          </ImageCopyrightContextMenu>
           <div ref={captionMaskRef} className="overflow-hidden">
             <p
               ref={captionTextRef}

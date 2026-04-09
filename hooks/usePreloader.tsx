@@ -170,6 +170,7 @@ export function usePreloader() {
         { autoAlpha: 1, duration: 0.5, ease: "sine.out" },
         "<+55%"
       )
+      .to(".portalled-el", { autoAlpha: 1, duration: 0.5, ease: "sine.out" }, "<")
       .set("#preloader", { display: "none" })
       .set(circleRef.current, { willChange: "auto" });
 
