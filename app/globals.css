@@ -132,6 +132,9 @@
   *::-webkit-scrollbar {
     display: none;
   }
+  *::selection {
+    @apply bg-muted text-foreground;
+  }
   body {
     @apply bg-background text-foreground font-dm;
   }

@@ -121,7 +121,7 @@ export default function Navbar() {
           </Link>
 
           {/* Center links - desktop only (lg+ so tablet uses mobile menu) */}
-          <ul className="hidden lg:flex items-center gap-0 justify-center">
+          <ul className="hidden lg:flex items-center gap-0 xl:gap-2 justify-center">
             {navLinks.map((link) => (
               <li key={link.href}>
                 <AnimatedNavLink link={link} isActive={isActiveLink(link.href)} />

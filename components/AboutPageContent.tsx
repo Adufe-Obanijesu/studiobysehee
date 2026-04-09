@@ -118,10 +118,11 @@ export default function AboutPageContent() {
               ref={closeButtonRef}
               type="button"
               onClick={closePreview}
-              className="absolute right-4 top-4 z-10 rounded-md p-2 text-foreground transition-colors hover:bg-muted"
+              className="absolute right-4 top-4 z-10 p-2 text-foreground group"
               aria-label="Close preview"
             >
-              <HiOutlineX className="size-6" aria-hidden />
+              <div className="absolute top-0 left-0 w-full h-full bg-muted group-hover:scale-100 scale-0 transition-transform transition-ease-200 rounded-full" />
+              <HiOutlineX className="size-6 relative z-10" aria-hidden />
             </button>
 
             <div
