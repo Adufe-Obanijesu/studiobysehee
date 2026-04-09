@@ -82,7 +82,7 @@ export function PageTransitionLoader() {
     <div
       ref={containerRef}
       className={cn(
-        "pointer-events-none fixed bottom-8 right-8 z-9999 flex items-center justify-center origin-center",
+        "pointer-events-none fixed bottom-8 xl:top-4 right-8 z-9999 flex origin-center",
         !isVisible && "hidden"
       )}
     >

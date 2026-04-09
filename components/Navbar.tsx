@@ -23,7 +23,7 @@ function AnimatedNavLink({ link, isActive }: { link: NavLink; isActive: boolean 
     <Link
       href={link.href}
       className={cn(
-        "text-sm inline-block leading-tight py-2 px-4 rounded-full text-foreground",
+        "text-sm inline-block leading-tight py-2 px-3 rounded-full text-foreground",
         isActive ? "bg-muted" : "bg-transparent"
       )}
       onMouseEnter={onMouseEnter}
@@ -121,7 +121,7 @@ export default function Navbar() {
           </Link>
 
           {/* Center links - desktop only (lg+ so tablet uses mobile menu) */}
-          <ul className="hidden lg:flex items-center gap-6 justify-center">
+          <ul className="hidden lg:flex items-center gap-0 justify-center">
             {navLinks.map((link) => (
               <li key={link.href}>
                 <AnimatedNavLink link={link} isActive={isActiveLink(link.href)} />
