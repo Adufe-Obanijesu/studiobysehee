@@ -5,7 +5,9 @@ import { useMemo } from "react";
 export function useImageCopyrightContext() {
   const copyrightNotice = useMemo(() => {
     const currentYear = new Date().getFullYear();
-    return `This photo is copyrighted © ${currentYear} Studio by Sehee. All rights reserved.`;
+    return (
+      `This photo is copyrighted © ${currentYear} \nStudio by Sehee. All rights reserved.`
+    );
   }, []);
 
   return {

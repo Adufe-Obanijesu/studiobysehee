@@ -29,7 +29,7 @@ export function ImageCopyrightContextMenu({
         >
           <ContextMenuPrimitive.Item
             disabled
-            className="cursor-default whitespace-normal opacity-100"
+            className="cursor-default whitespace-pre opacity-100"
           >
             {copyrightNotice}
           </ContextMenuPrimitive.Item>
