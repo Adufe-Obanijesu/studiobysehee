@@ -33,6 +33,7 @@ export default function VideoStackLayout({ videos }: VideoStackLayoutProps) {
         <div className="mx-auto flex w-full xl:max-w-3xl flex-col items-center gap-12 lg:gap-16">
           {videoItems.map((video) => (
             <article
+              // id={video.id}
               key={video.id}
               ref={(node) => setSectionRef(video.id, node)}
               className="w-full"
@@ -88,7 +89,7 @@ export default function VideoStackLayout({ videos }: VideoStackLayoutProps) {
                         ref={(node) => setMiniMapItemRef(video.id, node)}
                         type="button"
                         onClick={() => scrollToVideo(video.id)}
-                        className={cn("overflow-hidden bg-background transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2")}
+                        className={cn("overflow-hidden bg-background transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 grayscale")}
                         aria-label={`Go to ${video.client} video`}
                         aria-current={activeVideoId === video.id ? "true" : undefined}
                       >

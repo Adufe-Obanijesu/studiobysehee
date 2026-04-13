@@ -20,6 +20,7 @@ function extractYoutubeId(videoUrl: string): string | null {
 
 export function useVideoStackLayout(videos: VideoDataItem[]) {
   const fixedOverlaysPortalTarget = useGalleryLightboxPortalTarget();
+  const portalReady = fixedOverlaysPortalTarget != null;
   const containerRef = useRef<HTMLElement | null>(null);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const [activeVideoId, setActiveVideoId] = useState<string | null>(
@@ -62,7 +63,7 @@ export function useVideoStackLayout(videos: VideoDataItem[]) {
     () => {
       if (!videoItems.length) return;
 
-      const triggers: ScrollTrigger[] = [];
+      const entries: { trigger: ScrollTrigger; videoId: string }[] = [];
 
       videoItems.forEach((video) => {
         const section = sectionRefs.current[video.id];
@@ -72,21 +73,25 @@ export function useVideoStackLayout(videos: VideoDataItem[]) {
           trigger: section,
           start: "top center",
           end: "bottom center",
-          onEnter: () => setActiveVideoId(video.id),
-          onEnterBack: () => setActiveVideoId(video.id),
+          onToggle: (self) => {
+            if (self.isActive) setActiveVideoId(video.id);
+          },
         });
 
-        triggers.push(trigger);
+        entries.push({ trigger, videoId: video.id });
       });
-
-      if (!activeVideoId && videoItems[0]) {
-        setActiveVideoId(videoItems[0].id);
-      }
 
       ScrollTrigger.refresh();
 
+      const synced = entries.find((e) => e.trigger.isActive);
+      if (synced) {
+        setActiveVideoId(synced.videoId);
+      } else if (videoItems[0]) {
+        setActiveVideoId(videoItems[0].id);
+      }
+
       return () => {
-        triggers.forEach((trigger) => trigger.kill());
+        entries.forEach(({ trigger }) => trigger.kill());
       };
     },
     { scope: containerRef, dependencies: [videoItems] },
@@ -94,6 +99,8 @@ export function useVideoStackLayout(videos: VideoDataItem[]) {
 
   useGSAP(
     () => {
+      if (!portalReady) return;
+
       videoItems.forEach((video) => {
         const thumbnail = sectionRefs.current[`mini-${video.id}`];
         if (!thumbnail) return;
@@ -108,7 +115,15 @@ export function useVideoStackLayout(videos: VideoDataItem[]) {
         });
       });
     },
-    { dependencies: [activeVideoId, videoItems] },
+    { dependencies: [activeVideoId, videoItems, portalReady] },
+  );
+
+  useGSAP(
+    () => {
+      if (!portalReady) return;
+      ScrollTrigger.refresh();
+    },
+    { dependencies: [portalReady] },
   );
 
   const setMiniMapItemRef = useCallback((videoId: string, node: HTMLElement | null) => {
