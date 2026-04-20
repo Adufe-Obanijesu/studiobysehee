@@ -133,7 +133,7 @@ export function ThemeProvider({
   return (
     <ThemeContext.Provider value={value}>
       <GalleryLightboxPortalContext.Provider value={galleryLightboxPortalRef}>
-      <main className="bg-background min-h-screen overflow-y-hidden">
+      <main className="bg-background min-h-dvh overflow-y-hidden">
         <div ref={galleryLightboxPortalRef} className="portalled-el invisible" />
         <div
           ref={circleRef}

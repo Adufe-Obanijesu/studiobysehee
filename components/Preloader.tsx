@@ -46,7 +46,7 @@ export default function Preloader() {
           </div>
         </div>
 
-        <div id="intro-1" className="fixed top-0 left-0 w-full h-screen flex items-center justify-center px-6 md:px-12">
+        <div id="intro-1" className="fixed top-0 left-0 w-full h-dvh flex items-center justify-center px-6 md:px-12">
           <div
             ref={gridRef}
             className="grid w-3xl mx-auto lg:grid-cols-4 md:grid-cols-4 grid-cols-3 gap-6"

@@ -3,6 +3,7 @@
 import type { PropsWithChildren } from "react";
 import { ContextMenu as ContextMenuPrimitive } from "radix-ui";
 import { useImageCopyrightContext } from "@/hooks/useImageCopyrightContext";
+import { useImageCopyrightContextMenu } from "@/hooks/useImageCopyrightContextMenu";
 import { cn } from "@/lib/utils";
 
 type ImageCopyrightContextMenuProps = PropsWithChildren<{
@@ -14,11 +15,14 @@ export function ImageCopyrightContextMenu({
   className,
 }: ImageCopyrightContextMenuProps) {
   const { copyrightNotice } = useImageCopyrightContext();
+  const { triggerProps } = useImageCopyrightContextMenu();
 
   return (
     <ContextMenuPrimitive.Root>
       <ContextMenuPrimitive.Trigger asChild>
-        {children}
+        <span className="contents" {...triggerProps}>
+          {children}
+        </span>
       </ContextMenuPrimitive.Trigger>
       <ContextMenuPrimitive.Portal>
         <ContextMenuPrimitive.Content
