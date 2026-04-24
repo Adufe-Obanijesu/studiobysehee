@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
         destination: "/videos",
         permanent: true,
       },
+      {
+        source: "/overview",
+        destination: "/",
+        permanent: true,
+      },
     ];
   },
   images: {
