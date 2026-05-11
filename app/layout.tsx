@@ -1,5 +1,6 @@
 import { Cormorant_Garamond, DM_Sans, Geist } from "next/font/google";
 import { cookies } from "next/headers";
+import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { PreloaderProvider } from "@/context/PreloaderContext";
@@ -9,11 +10,12 @@ import Preloader from "@/components/Preloader";
 import QueryProvider from "@/components/QueryProvider";
 import { BookingModal } from "@/components/BookingModal";
 import Navbar from "@/components/Navbar";
+import { PageTransitionProvider } from "@/context/PageTransitionContext";
+import { PageTransitionLoader } from "@/components/PageTransitionLoader";
 import SiteJsonLd from "@/components/seo/SiteJsonLd";
 import { buildRootLayoutMetadata } from "@/data/seo";
 
-const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
-
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 // import CustomCursor from "@/components/CustomCursor";
 
@@ -48,6 +50,24 @@ export default async function RootLayout({
       <body
         className={`relative ${cormorant.variable} ${dmSans.variable} font-dm antialiased`}
       >
+        <PageTransitionProvider>
+          <PageTransitionLoader />
+          <BookingProvider>
+            <PreloaderProvider>
+              <ThemeProvider initialIsDark={initialIsDark}>
+                  <Navbar />
+                <QueryProvider>
+                  <Preloader />
+                  <div id="page-content" className="invisible">
+                    {children}
+                  </div>
+                  {/* <CustomCursor /> */}
+                </QueryProvider>
+              </ThemeProvider>
+            </PreloaderProvider>
+            <BookingModal />
+          </BookingProvider>
+        </PageTransitionProvider>
         <SiteJsonLd />
         <BookingProvider>
           <PreloaderProvider>

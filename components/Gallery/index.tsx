@@ -35,7 +35,12 @@ export default function Gallery({
     loadMore,
   });
 
-  const { isImageLoaded, markImageLoaded: markGridImageLoaded } =
+  const {
+    isImageLoaded,
+    isImageFailed,
+    markImageLoaded: markGridImageLoaded,
+    markImageFailed: markGridImageFailed,
+  } =
     useGalleryImageLoading(images);
 
   const {
@@ -44,8 +49,10 @@ export default function Gallery({
     canNavigatePrev,
     canNavigateNext,
     isLightboxImageLoaded,
+    isLightboxImageFailed,
     lightboxSizes,
     markLightboxImageLoaded,
+    markLightboxImageFailed,
     backdropRef,
     contentWrapperRef,
     captionMaskRef,
@@ -78,7 +85,9 @@ export default function Gallery({
 
   const renderMasonryItem = useGalleryMasonryItemRenderer({
     isImageLoaded,
+    isImageFailed,
     markImageLoaded,
+    markImageFailed: markGridImageFailed,
     registerFigureRef,
     openFromImageId,
   });
@@ -112,8 +121,10 @@ export default function Gallery({
             captionMaskRef={captionMaskRef}
             captionTextRef={captionTextRef}
             isLightboxImageLoaded={isLightboxImageLoaded}
+            isLightboxImageFailed={isLightboxImageFailed}
             lightboxSizes={lightboxSizes}
             onImageLoad={markLightboxImageLoaded}
+            onImageError={markLightboxImageFailed}
           />,
           lightboxPortalTarget,
         )}

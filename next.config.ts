@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  // allowedDevOrigins: ["10.109.217.98"],
   images: {
     remotePatterns: [
       {

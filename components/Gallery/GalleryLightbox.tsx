@@ -3,6 +3,7 @@
 import type { RefObject } from "react";
 import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ImageCopyrightContextMenu } from "@/components/ui/image-copyright-context-menu";
 import { HiOutlineX, HiChevronLeft, HiChevronRight } from "react-icons/hi";
 import { cn } from "@/lib/utils";
 import type { GalleryImage } from "./types";
@@ -23,8 +24,10 @@ export type GalleryLightboxProps = {
   captionMaskRef: RefObject<HTMLDivElement | null>;
   captionTextRef: RefObject<HTMLParagraphElement | null>;
   isLightboxImageLoaded: boolean;
+  isLightboxImageFailed: boolean;
   lightboxSizes: string;
   onImageLoad: () => void;
+  onImageError: () => void;
 };
 
 export function GalleryLightbox({
@@ -43,8 +46,10 @@ export function GalleryLightbox({
   captionMaskRef,
   captionTextRef,
   isLightboxImageLoaded,
+  isLightboxImageFailed,
   lightboxSizes,
   onImageLoad,
+  onImageError,
 }: GalleryLightboxProps) {
   if (!isOpen || !activeImage) return null;
 
@@ -119,34 +124,44 @@ export function GalleryLightbox({
             width: `min(100%, calc(85dvh * (${activeImage.width} / ${activeImage.height})), 64rem)`,
           }}
         >
-          <div
-            className="relative overflow-hidden rounded-xl"
-            style={{
-              aspectRatio: `${activeImage.width} / ${activeImage.height}`,
-              maxHeight: "85dvh",
-            }}
-          >
-            <Skeleton className="absolute inset-0 rounded-xl" />
-            <Image
-              fill
-              src={activeImage.src}
-              alt={activeImage.alt || "Gallery image"}
-              className={`relative z-10 object-contain transition-opacity duration-300 ${
-                isLightboxImageLoaded ? "opacity-100" : "opacity-0"
-              }`}
-              sizes={lightboxSizes}
-              priority
-              unoptimized
-              loading="eager"
-              onLoad={onImageLoad}
-            />
-          </div>
+          <ImageCopyrightContextMenu>
+            <figure
+              className="relative overflow-hidden rounded-xl"
+              style={{
+                aspectRatio: `${activeImage.width} / ${activeImage.height}`,
+                maxHeight: "85dvh",
+              }}
+            >
+              {!isLightboxImageFailed && (
+                <Skeleton className="absolute inset-0 rounded-xl" />
+              )}
+              {isLightboxImageFailed && (
+                <div
+                  className={`absolute inset-0 rounded-xl bg-linear-to-br from-rose-200/70 via-orange-200/60 to-amber-200/70`}
+                />
+              )}
+              <Image
+                fill
+                src={activeImage.src}
+                alt={activeImage.alt || "Gallery image"}
+                className={`relative z-10 object-contain transition-opacity duration-300 rounded-xl ${
+                  isLightboxImageLoaded ? "opacity-100" : "opacity-0"
+                }`}
+                sizes={lightboxSizes}
+                priority
+                unoptimized
+                loading="eager"
+                onLoad={onImageLoad}
+                onError={onImageError}
+              />
+            </figure>
+          </ImageCopyrightContextMenu>
           <div ref={captionMaskRef} className="overflow-hidden">
             <p
               ref={captionTextRef}
               className="text-sm text-foreground/90 md:text-base text-center"
             >
-              {activeImage.alt || "Gallery image"}
+              {activeImage.alt}
             </p>
           </div>
         </div>

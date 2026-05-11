@@ -2,7 +2,7 @@
 
 import { createPortal } from "react-dom";
 import Image from "next/image";
-import Link from "next/link";
+import { TransitionLink as Link } from "@/components/TransitionLink";
 import { useAbout } from "@/hooks/useAbout";
 import { useNavLinkHover } from "@/hooks/useNavbar";
 import {
@@ -16,6 +16,7 @@ import {
 } from "@/data/about";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ImageCopyrightContextMenu } from "@/components/ui/image-copyright-context-menu";
 import { HiOutlineX } from "react-icons/hi";
 
 type AnimatedAboutLinkProps = {
@@ -118,35 +119,38 @@ export default function AboutPageContent() {
               ref={closeButtonRef}
               type="button"
               onClick={closePreview}
-              className="absolute right-4 top-4 z-10 rounded-md p-2 text-foreground transition-colors hover:bg-muted"
+              className="absolute right-4 top-4 z-10 p-2 text-foreground group"
               aria-label="Close preview"
             >
-              <HiOutlineX className="size-6" aria-hidden />
+              <div className="absolute top-0 left-0 w-full h-full bg-muted group-hover:scale-100 scale-0 transition-transform transition-ease-200 rounded-full" />
+              <HiOutlineX className="size-6 relative z-10" aria-hidden />
             </button>
 
-            <div
-              ref={previewImageContainerRef}
-              data-about-preview-image
-              className="relative z-10 overflow-hidden rounded-xl"
-              style={{
-                width: "min(85vw, 900px)",
-                aspectRatio: `${ABOUT_PORTRAIT_WIDTH} / ${ABOUT_PORTRAIT_HEIGHT}`,
-              }}
-            >
-              <Skeleton className="absolute inset-0 rounded-xl" />
-              <Image
-                fill
-                src={ABOUT_PORTRAIT_SRC}
-                alt="Portrait of Sehee Kim"
-                priority
-                sizes="min(85vw, 900px)"
-                className={cn(
-                  "relative z-10 object-cover transition-opacity duration-300",
-                  isImageLoaded ? "opacity-100" : "opacity-0"
-                )}
-                onLoad={handleImageLoad}
-              />
-            </div>
+            <ImageCopyrightContextMenu>
+              <figure
+                ref={previewImageContainerRef}
+                data-about-preview-image
+                className="relative z-10 overflow-hidden rounded-xl"
+                style={{
+                  width: "min(85vw, 900px)",
+                  aspectRatio: `${ABOUT_PORTRAIT_WIDTH} / ${ABOUT_PORTRAIT_HEIGHT}`,
+                }}
+              >
+                <Skeleton className="absolute inset-0 rounded-xl" />
+                <Image
+                  fill
+                  src={ABOUT_PORTRAIT_SRC}
+                  alt="Portrait of Sehee Kim"
+                  priority
+                  sizes="min(85vw, 900px)"
+                  className={cn(
+                    "relative z-10 object-cover transition-opacity duration-300",
+                    isImageLoaded ? "opacity-100" : "opacity-0"
+                  )}
+                  onLoad={handleImageLoad}
+                />
+              </figure>
+            </ImageCopyrightContextMenu>
           </div>,
           previewPortalTarget,
         )

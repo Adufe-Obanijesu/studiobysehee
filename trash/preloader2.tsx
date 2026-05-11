@@ -52,7 +52,7 @@ export default function Preloader2() {
   );
 
   return (
-    <section className="flex min-h-screen items-center justify-center bg-background p-6">
+    <section className="flex min-h-dvh items-center justify-center bg-background p-6">
       <div
         ref={gridRef}
         className="grid w-3xl mx-auto grid-cols-4 gap-6"

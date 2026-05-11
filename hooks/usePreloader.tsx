@@ -145,7 +145,7 @@ export function usePreloader() {
 
       const tl = gsap.timeline({ paused: false });
       tl.add(createGridIntroSegment(items));
-      tl.add(createGridExitAndIntroSwitchSegment(items), "+=0.35");
+      tl.add(createGridExitAndIntroSwitchSegment(items), "+=0.75");
       tl.add(createTextRevealSegment(line1Chars, line2Chars));
       if (circleRef.current) {
         tl.add(createCircleSegment(circleRef.current));
@@ -170,6 +170,7 @@ export function usePreloader() {
         { autoAlpha: 1, duration: 0.5, ease: "sine.out" },
         "<+55%"
       )
+      .to(".portalled-el", { autoAlpha: 1, duration: 0.5, ease: "sine.out" }, "<")
       .set("#preloader", { display: "none" })
       .set(circleRef.current, { willChange: "auto" });
 

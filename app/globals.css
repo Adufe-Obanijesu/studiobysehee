@@ -132,6 +132,14 @@
   *::-webkit-scrollbar {
     display: none;
   }
+  *::selection {
+    @apply bg-muted text-foreground;
+  }
+  img {
+	pointer-events: none;
+	user-select: none;
+	-webkit-user-drag: none;
+  }
   body {
     @apply bg-background text-foreground font-dm;
   }
