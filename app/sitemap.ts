@@ -1,7 +1,9 @@
 import type { MetadataRoute } from "next";
-import { getSiteUrl, SEO_SITEMAP_PATHS } from "@/data/seo";
+import { getSiteUrl, isSiteIndexingAllowed, SEO_SITEMAP_PATHS } from "@/data/seo";
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  if (!isSiteIndexingAllowed()) return [];
+
   const base = getSiteUrl();
 
   return SEO_SITEMAP_PATHS.map((path) => ({

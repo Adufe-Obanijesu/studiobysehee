@@ -16,6 +16,24 @@ export function getSiteUrl(): string {
   return "http://localhost:3000";
 }
 
+/** When false, emit noindex and disallow all crawlers via robots.txt (see NEXT_PUBLIC_SITE_INDEXABLE). */
+export function isSiteIndexingAllowed(): boolean {
+  const raw = process.env.NEXT_PUBLIC_SITE_INDEXABLE?.trim().toLowerCase();
+  if (raw === "false" || raw === "0" || raw === "no") return false;
+  return true;
+}
+
+function indexingRobotsMetadata(): Metadata["robots"] {
+  if (!isSiteIndexingAllowed()) {
+    return {
+      index: false,
+      follow: false,
+      googleBot: { index: false, follow: false },
+    };
+  }
+  return { index: true, follow: true };
+}
+
 function toMetadataBase(): URL {
   const base = getSiteUrl();
   return new URL(base.endsWith("/") ? base : `${base}/`);
@@ -66,7 +84,7 @@ export function buildRootLayoutMetadata(): Metadata {
     },
     title: home.title,
     description: home.description,
-    robots: { index: true, follow: true },
+    robots: indexingRobotsMetadata(),
     openGraph: {
       type: "website",
       locale: "en_US",
@@ -94,6 +112,7 @@ export function buildMetadataForPath(path: SeoPath): Metadata {
     title: { absolute: title },
     description,
     alternates: { canonical },
+    robots: indexingRobotsMetadata(),
     openGraph: {
       url: canonical,
       title,

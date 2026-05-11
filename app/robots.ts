@@ -1,7 +1,13 @@
 import type { MetadataRoute } from "next";
-import { getSiteUrl } from "@/data/seo";
+import { getSiteUrl, isSiteIndexingAllowed } from "@/data/seo";
 
 export default function robots(): MetadataRoute.Robots {
+  if (!isSiteIndexingAllowed()) {
+    return {
+      rules: { userAgent: "*", disallow: "/" },
+    };
+  }
+
   const base = getSiteUrl();
   const host = base.replace(/^https?:\/\//, "").replace(/\/+$/, "");
 
