@@ -2,7 +2,21 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  allowedDevOrigins: ['10.109.217.98'],
+  async redirects() {
+    return [
+      {
+        source: "/video",
+        destination: "/videos",
+        permanent: true,
+      },
+      {
+        source: "/overview",
+        destination: "/",
+        permanent: true,
+      },
+    ];
+  },
+  // allowedDevOrigins: ["10.109.217.98"],
   images: {
     remotePatterns: [
       {

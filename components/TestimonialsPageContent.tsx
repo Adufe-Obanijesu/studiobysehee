@@ -18,9 +18,9 @@ export default function TestimonialsPageContent() {
       <div className="container mx-auto px-8 sm:px-6">
         {/* Section Header */}
         <div className="mx-auto max-w-2xl text-center mb-8">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
             Happy Clients
-          </h2>
+          </h1>
         </div>
 
         {/* Testimonials Masonry Grid */}
