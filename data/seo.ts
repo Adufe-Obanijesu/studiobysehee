@@ -112,7 +112,6 @@ export function buildMetadataForPath(path: SeoPath): Metadata {
     title: { absolute: title },
     description,
     alternates: { canonical },
-    robots: indexingRobotsMetadata(),
     openGraph: {
       url: canonical,
       title,
