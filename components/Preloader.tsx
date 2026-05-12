@@ -38,11 +38,15 @@ export default function Preloader() {
                 {LINE2}
               </h2>
             </div>
-            <div
+            <svg
               ref={circleRef}
-              className="md:h-4 md:w-4 h-3 w-3 lg:mt-6 md:mt-4 mt-2 shrink-0 opacity-0 rounded-full bg-foreground will-change-transform"
+              viewBox="0 0 100 100"
+              shapeRendering="geometricPrecision"
+              className="md:h-4 md:w-4 h-3 w-3 lg:mt-6 md:mt-4 mt-2 shrink-0 block overflow-visible opacity-0 text-foreground will-change-transform"
               aria-hidden
-            />
+            >
+              <circle cx="50" cy="50" r="50" fill="currentColor" />
+            </svg>
           </div>
         </div>
 

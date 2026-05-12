@@ -79,7 +79,7 @@ function createTextRevealSegment(
   return tl;
 }
 
-function createCircleSegment(circleEl: HTMLElement): gsap.core.Timeline {
+function createCircleSegment(circleEl: SVGSVGElement): gsap.core.Timeline {
   const tl = gsap.timeline();
   tl.set(circleEl, { transformOrigin: "70% center" })
     .to(circleEl, { opacity: 1, ease: "sine.out" })
@@ -104,7 +104,7 @@ function createCircleSegment(circleEl: HTMLElement): gsap.core.Timeline {
 }
 
 export function usePreloader() {
-  const circleRef = useRef<HTMLDivElement>(null);
+  const circleRef = useRef<SVGSVGElement>(null);
   const line1Ref = useRef<HTMLHeadingElement>(null);
   const line2Ref = useRef<HTMLHeadingElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);

@@ -53,7 +53,7 @@ export function ThemeProvider({
 }) {
   const [isDark, setIsDark] = useState(initialIsDark);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const circleRef = useRef<HTMLDivElement>(null);
+  const circleRef = useRef<SVGSVGElement>(null);
   const galleryLightboxPortalRef = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {}, { scope: circleRef });
@@ -81,13 +81,19 @@ export function ThemeProvider({
     const el = circleRef.current;
     if (!el || isTransitioning) return;
 
+    const dot = el.querySelector<SVGCircleElement>("circle");
+    if (!dot) return;
+
     const nextIsDark = !isDark;
     setIsTransitioning(true);
     gsap.killTweensOf(el);
 
     gsap.set(el, {
       scale: 1,
-      backgroundColor: nextIsDark
+      transformOrigin: "center center",
+    });
+    gsap.set(dot, {
+      fill: nextIsDark
         ? "oklch(0.135 0.004 83)"
         : "oklch(0.966 0.006 83)",
     });
@@ -135,11 +141,15 @@ export function ThemeProvider({
       <GalleryLightboxPortalContext.Provider value={galleryLightboxPortalRef}>
       <main className="bg-background min-h-dvh overflow-y-hidden">
         <div ref={galleryLightboxPortalRef} className="portalled-el invisible" />
-        <div
+        <svg
           ref={circleRef}
-          className="fixed z-0 left-1/2 top-1/2 h-4 w-4 scale-0 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none bg-foreground origin-center will-change-transform"
+          viewBox="0 0 100 100"
+          shapeRendering="geometricPrecision"
+          className="pointer-events-none fixed z-0 left-1/2 top-1/2 h-4 w-4 origin-center -translate-x-1/2 -translate-y-1/2 scale-0 overflow-visible text-foreground will-change-transform"
           aria-hidden
-        />
+        >
+          <circle cx="50" cy="50" r="50" fill="currentColor" />
+        </svg>
         <div className="relative z-10">
           <div className="mt-16">
             {children}

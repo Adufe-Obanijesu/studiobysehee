@@ -18,7 +18,7 @@ const EASE_CIRCLE = "power3.inOut";
 export function useBookingModal() {
   const { isOpen, close } = useBooking();
   const scopeRef = useRef<HTMLDivElement>(null);
-  const circleRef = useRef<HTMLDivElement>(null);
+  const circleRef = useRef<SVGSVGElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const modalTimelineRef = useRef<gsap.core.Timeline | null>(null);
   const hasOpenedOnceRef = useRef(false);

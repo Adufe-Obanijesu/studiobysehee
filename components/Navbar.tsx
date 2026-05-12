@@ -201,10 +201,21 @@ export default function Navbar() {
         aria-label="Main menu"
       >
         <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
-          <div
+          <svg
             ref={circleRef}
-            className="h-4 w-4 md:h-6 md:w-6 rounded-full bg-background border-[.05px] border-border transition-colors duration-200 ease-in-out will-change-transform"
-          />
+            viewBox="0 0 100 100"
+            shapeRendering="geometricPrecision"
+            className="h-4 w-4 md:h-6 md:w-6 block overflow-visible transition-colors duration-200 ease-in-out will-change-transform"
+            aria-hidden
+          >
+            <circle
+              cx="50"
+              cy="50"
+              r="50"
+              className="fill-background stroke-border"
+              strokeWidth={0.35}
+            />
+          </svg>
         </div>
 
         <div

@@ -24,7 +24,7 @@ export function useNavbar() {
   const prevMobileMenuOpenRef = useRef(false);
 
   const overlayScopeRef = useRef<HTMLDivElement | null>(null);
-  const circleRef = useRef<HTMLDivElement | null>(null);
+  const circleRef = useRef<SVGSVGElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
   const mobileLinksRef = useRef<HTMLUListElement | null>(null);
   const mobileSocialsRef = useRef<HTMLDivElement | null>(null);
