@@ -150,6 +150,17 @@ export function usePreloader() {
       if (circleRef.current) {
         tl.add(createCircleSegment(circleRef.current));
       }
+      const handleSpacebarToggle = (event: KeyboardEvent) => {
+        if (event.code !== "Space") return;
+        if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+        event.preventDefault();
+        tl.paused(!tl.paused());
+      };
+      const removeSpacebarListener = () => {
+        window.removeEventListener("keydown", handleSpacebarToggle);
+      };
+      window.addEventListener("keydown", handleSpacebarToggle);
+
       tl
       .to("#preloader", { opacity: 0, duration: .2 }, "<+75%")
       .fromTo(
@@ -175,10 +186,12 @@ export function usePreloader() {
       .set(circleRef.current, { willChange: "auto" });
 
       tl.eventCallback("onComplete", () => {
+        removeSpacebarListener();
         markPreloaderFinishedRef.current?.();
       });
 
       return () => {
+        removeSpacebarListener();
         tl.eventCallback("onComplete", null);
         split1.revert();
         split2.revert();
