@@ -8,7 +8,6 @@ import {
   SvgChase,
   SvgCoachella,
   SvgFora,
-  SvgModernAge,
   Papyrus,
   SvgRalphLauren,
   SvgRockefellerCenter,
@@ -18,8 +17,6 @@ import {
   SvgWalmart,
   SvgWellsFargo,
   SvgYoutube,
-  Kuzco,
-  BasilHayden,
   SVGGoogle,
 } from "./brand-svgs";
 
