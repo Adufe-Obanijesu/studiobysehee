@@ -42,13 +42,24 @@ export function BookingModal() {
         aria-hidden
         className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden"
       >
-        <div
+        <svg
           ref={circleRef}
+          viewBox="0 0 100 100"
+          shapeRendering="geometricPrecision"
           className={cn(
-            "h-4 w-4 shrink-0 rounded-full bg-background border border-border",
+            "h-4 w-4 shrink-0 block overflow-visible",
             "will-change-transform"
           )}
-        />
+          aria-hidden
+        >
+          <circle
+            cx="50"
+            cy="50"
+            r="50"
+            className="fill-background stroke-border"
+            strokeWidth={0.35}
+          />
+        </svg>
       </div>
 
       <div
